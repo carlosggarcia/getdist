@@ -406,10 +406,10 @@ class ParamNames(ParamList):
             with open(fileName) as f:
                 self.names = [ParamInfo(line) for line in [s.strip() for s in f] if line != '']
         elif extension.lower() in ('.yaml', '.yml'):
-            from getdist.yaml_tools import yaml_load_file
+            from getdist import yaml_tools
             from getdist.cobaya_interface import get_info_params, is_sampled_param
             from getdist.cobaya_interface import is_derived_param, _p_label, _p_renames
-            self.info_dict = yaml_load_file(fileName)
+            self.info_dict = yaml_tools.yaml_load_file(fileName)
             info_params = get_info_params(self.info_dict)
             # first sampled, then derived
             self.names = [ParamInfo(name=param, label=(info or {}).get(_p_label, param),
