@@ -1,7 +1,6 @@
 import os
 import random
 import numpy as np
-from collections import OrderedDict
 from getdist.paramnames import ParamNames, ParamInfo, escapeLatex
 from getdist.convolve import autoConvolve
 from getdist import cobaya_interface
@@ -1148,7 +1147,7 @@ class Chains(WeightedSamples):
         :param want_derived: include derived parameters
         :return: ordered dictionary of parameter values
         """
-        res = OrderedDict()
+        res = dict()
         for i, name in enumerate(self.paramNames.names):
             if want_derived or not name.isDerived:
                 res[name.name] = self.samples[ix, i]

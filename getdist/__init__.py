@@ -9,6 +9,12 @@ from getdist.mcsamples import MCSamples, loadMCSamples
 import os
 import sys
 
+if sys.version_info < (3, 7):
+    import platform
+
+    if platform.python_implementation() != 'CPython':
+        raise ValueError('Only CPython is supported on Python 3.6')
+
 
 def get_defaults_file(name='analysis_defaults.ini'):
     return os.path.join(os.path.abspath(os.path.dirname(__file__)), name)

@@ -2,9 +2,8 @@ import decimal
 import os
 from io import BytesIO
 import numpy as np
-from getdist import paramnames
+from getdist.paramnames import ParamInfo, ParamList
 import tempfile
-from collections import OrderedDict
 
 _sci_tolerance = 4
 
@@ -461,7 +460,7 @@ class ResultTable(object):
             return outfile
 
 
-class ParamResults(paramnames.ParamList):
+class ParamResults(ParamList):
     """
     Base class for a set of parameter results, inheriting from :class:`~.paramnames.ParamList`,
     so that self.names is a list of :class:`~.paramnames.ParamInfo` instances for each parameter, which
@@ -541,7 +540,7 @@ class BestFit(ParamResults):
                     break
                 continue
             if not isFixed or want_fixed:
-                param = paramnames.ParamInfo()
+                param = ParamInfo()
                 param.isFixed = isFixed
                 param.isDerived = isDerived
                 (param.number, param.best_fit, param.name, param.label) = [s.strip() for s in line.split(None, 3)]
@@ -571,7 +570,7 @@ class BestFit(ParamResults):
             return None
 
     def getParamDict(self, include_derived=True):
-        res = OrderedDict()
+        res = dict()
         for i, name in enumerate(self.names):
             if include_derived or not name.isDerived:
                 res[name.name] = name.best_fit
@@ -680,7 +679,7 @@ class MargeStats(ParamResults):
         for line in textFileLines[3:]:
             if len(line.strip()) == 0:
                 break
-            param = paramnames.ParamInfo()
+            param = ParamInfo()
             items = [s.strip() for s in line.split(None, len(self.limits) * 3 + 3)]
             param.name = items[0]
             if param.name[-1] == '*':
@@ -753,7 +752,7 @@ class MargeStats(ParamResults):
         return res + [self.limitText(limit) + '\\% limits']
 
     def texValues(self, formatter, p, limit=2, refResults=None, shiftSigma_indep=False, shiftSigma_subset=False):
-        if not isinstance(p, paramnames.ParamInfo):
+        if not isinstance(p, ParamInfo):
             param = self.parWithName(p)
         else:
             param = self.parWithName(p.name)

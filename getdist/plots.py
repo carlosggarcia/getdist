@@ -742,17 +742,17 @@ class GetDistPlotter(_BaseObject):
         :param kwargs: optional settings to override in the current ones
         :return: The updated dict of arguments.
         """
-        if isinstance(self.settings.plot_args, dict):
+        if hasattr(self.settings.plot_args, "keys"):
             args = self.settings.plot_args
         elif isinstance(self.settings.plot_args, (list, tuple)):
             if len(self.settings.plot_args) > plotno:
                 args = self.settings.plot_args[plotno]
                 if args is None:
-                    args = dict()
+                    args = {}
             else:
                 args = {}
         elif not self.settings.plot_args:
-            args = dict()
+            args = {}
         else:
             raise GetDistPlotError(
                 'plot_args must be list of dictionaries or dictionary: %s' % self.settings.plot_args)
@@ -1336,7 +1336,7 @@ class GetDistPlotter(_BaseObject):
             line_args = kwargs.get('contour_args')
         if line_args is None:
             line_args = [{}] * nroots
-        elif isinstance(line_args, dict):
+        elif hasattr(line_args, "keys"):
             line_args = [line_args] * nroots
         if len(line_args) < nroots:
             line_args += [{}] * (nroots - len(line_args))

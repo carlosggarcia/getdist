@@ -10,9 +10,7 @@ import sys
 import signal
 import warnings
 from io import BytesIO
-from collections import OrderedDict
 from getdist.gui.qt_import import pyside_version
-
 import getdist
 from getdist import plots, IniFile
 from getdist.chain_grid import ChainDirGrid, file_root_to_root, get_chain_root_files, load_supported_grid
@@ -443,7 +441,7 @@ class MainWindow(QMainWindow):
         leftLayout.setSpacing(5)
         leftLayout.addWidget(h_stack(self.listDirectories, self.pushButtonSelect), 0, 0, 1, 4)
 
-        leftLayout.addWidget(self.comboBoxRootname, 1, 0, 1, 3)
+        leftLayout.addWidget(self.comboBoxRootname, 1, 0, 1, 4)
         leftLayout.addWidget(self.comboBoxParamTag, 1, 0, 1, 4)
         leftLayout.addWidget(self.comboBoxDataTag, 2, 0, 1, 4)
         leftLayout.addWidget(h_stack(self.listRoots, self.pushButtonRemove), 3, 0, 2, 4)
@@ -1100,7 +1098,7 @@ class MainWindow(QMainWindow):
         if not len(roots):
             return
         # Get previous selection (with its renames) before we overwrite the list of tags
-        old_selection = OrderedDict([("x", []), ("y", [])])
+        old_selection = {"x": [], "y": []}
         for x_, getter in zip(old_selection, [self.getXParams, self.getYParams]):
             if not hasattr(self, "paramNames"):
                 break
@@ -1128,8 +1126,7 @@ class MainWindow(QMainWindow):
         # Create tags for list widget
         renames = self.paramNames.getRenames(keep_empty=True)
         renames_list_func = lambda x: (" (" + ", ".join(x) + ")") if x else ""
-        self.paramNamesTags = OrderedDict([
-            (p + renames_list_func(r), p) for p, r in renames.items()])
+        self.paramNamesTags = {p + renames_list_func(r): p for p, r in renames.items()}
         self._updateListParameters(list(self.paramNamesTags), self.listParametersX)
         self._updateListParameters(list(self.paramNamesTags), self.listParametersY)
         # Update selection in both boxes (needs to be done after *both* boxes have been

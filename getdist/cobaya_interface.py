@@ -3,7 +3,6 @@
 from importlib import import_module
 from copy import deepcopy
 import logging
-from collections import OrderedDict as odict
 from numbers import Number
 import numpy as np
 import os
@@ -119,7 +118,7 @@ def get_info_params(info):
     info = yaml_file_or_dict(info)
     # Prune fixed parameters
     info_params = info.get(_params)
-    info_params_full = odict()
+    info_params_full = dict()
     for p, pinfo in info_params.items():
         info_params_full[p] = info_params[p]
     # Add prior and likelihoods
@@ -220,9 +219,9 @@ def expand_info_param(info_param):
     info_param = deepcopy(info_param)
     if not hasattr(info_param, "keys"):
         if info_param is None:
-            info_param = odict()
+            info_param = {}
         else:
-            info_param = odict([(_p_value, info_param)])
+            info_param = {_p_value: info_param}
     if all((f not in info_param) for f in [_prior, _p_value, _p_derived]):
         info_param[_p_derived] = True
     # Dynamical input parameters: save as derived by default

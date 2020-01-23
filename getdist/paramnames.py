@@ -1,7 +1,6 @@
 import os
 import fnmatch
 from itertools import chain
-from collections import OrderedDict
 
 
 def makeList(roots):
@@ -303,9 +302,9 @@ class ParamList(object):
         """
         Gets dictionary of renames known to each parameter.
         """
-        return OrderedDict([(param.name, getattr(param, "renames", []))
-                            for param in self.names
-                            if (getattr(param, "renames", False) or keep_empty)])
+        return {param.name: getattr(param, "renames", [])
+                for param in self.names
+                if (getattr(param, "renames", False) or keep_empty)}
 
     def updateRenames(self, renames):
         """

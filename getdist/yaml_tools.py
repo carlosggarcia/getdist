@@ -1,7 +1,6 @@
 # JT 2017-19
 
 import re
-from collections import OrderedDict as odict
 
 try:
     import yaml
@@ -18,18 +17,10 @@ class InputSyntaxError(Exception):
 # Better loader for YAML
 # 1. Matches 1e2 as 100 (no need for dot, or sign after e),
 #    from http://stackoverflow.com/a/30462009
-# 2. Wrapper to load mappings as OrderedDict (for likelihoods and params),
-#    from http://stackoverflow.com/a/21912744
-def yaml_load(text_stream, Loader=yaml.Loader, object_pairs_hook=odict, file_name=None):
+def yaml_load(text_stream, Loader=yaml.Loader, file_name=None):
     class OrderedLoader(Loader):
         pass
 
-    def construct_mapping(loader, node):
-        loader.flatten_mapping(node)
-        return object_pairs_hook(loader.construct_pairs(node))
-
-    OrderedLoader.add_constructor(
-        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, construct_mapping)
     OrderedLoader.add_implicit_resolver(
         u'tag:yaml.org,2002:float',
         re.compile(u'''^(?:

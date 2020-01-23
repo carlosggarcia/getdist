@@ -1,5 +1,4 @@
 import os
-from collections import OrderedDict
 import numpy as np
 
 
@@ -18,8 +17,8 @@ class ParamBounds(object):
         :param fileName: optional file name to read from
         """
         self.names = []
-        self.lower = OrderedDict()
-        self.upper = OrderedDict()
+        self.lower = {}
+        self.upper = {}
         if fileName is not None:
             self.loadFromFile(fileName)
 
@@ -106,8 +105,7 @@ class ParamBounds(object):
         """
         :return: dictionary of fixed parameter values
         """
-        from collections import OrderedDict
-        res = OrderedDict()
+        res = {}
         for name in self.names:
             value = self.fixedValue(name)
             if value is not None:
