@@ -27,7 +27,7 @@ class ParamBounds(object):
         self.filenameLoadedFrom = os.path.split(fileName)[1]
         extension = os.path.splitext(fileName)[-1]
         if extension in ('.ranges', '.bounds'):
-            with open(fileName) as f:
+            with open(fileName, encoding='utf-8-sig') as f:
                 for line in f:
                     strings = [text.strip() for text in line.split()]
                     if len(strings) == 3:
@@ -61,7 +61,7 @@ class ParamBounds(object):
 
         :param fileName: file name to save to
         """
-        with open(fileName, 'w') as f:
+        with open(fileName, 'w', encoding='utf-8') as f:
             f.write(str(self))
 
     def setFixed(self, name, value):

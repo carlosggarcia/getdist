@@ -16,7 +16,7 @@ class TextFile(object):
         self.lines = lines or []
 
     def write(self, outfile):
-        with open(outfile, 'w') as f:
+        with open(outfile, 'w', encoding='utf-8') as f:
             f.write("\n".join(self.lines))
 
 

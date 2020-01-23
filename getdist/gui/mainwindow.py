@@ -20,6 +20,12 @@ from getdist.mcsamples import SettingError, ParamError
 from getdist.gui.SyntaxHighlight import PythonHighlighter
 import matplotlib.pyplot as plt
 
+try:
+    # If cosmomc is configured
+    from paramgrid import batchjob
+except ImportError:
+    batchjob = None
+
 if pyside_version == 2:
     from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
     from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as QNavigationToolbar
@@ -101,13 +107,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("GetDist GUI")
         self.setWindowIcon(self._icon('Icon', False))
 
-        if base_dir is None:
-            try:
-                # If cosmomc is configured
-                from paramgrid import batchjob
-                base_dir = batchjob.getCodeRootPath()
-            except ImportError:
-                pass
+        if base_dir is None and batchjob:
+            base_dir = batchjob.getCodeRootPath()
         if base_dir:
             os.chdir(base_dir)
         self.updating = False
@@ -633,13 +634,14 @@ class MainWindow(QMainWindow):
             return
         filename = str(filename)
         logging.debug("Export script to %s" % filename)
-        with open(filename, 'w') as f:
+        with open(filename, 'w', encoding="utf-8") as f:
             f.write(script)
 
     def reLoad(self):
         adir = self.getSettings().value('lastSearchDirectory')
         if adir is not None:
-            batchjob.resetGrid(adir)
+            if batchjob:
+                batchjob.resetGrid(adir)
             self.openDirectory(adir)
         if self.plotter:
             self.plotter.sample_analyser.reset(self.current_settings)
@@ -1737,7 +1739,7 @@ class MainWindow(QMainWindow):
             return
         filename = str(filename)
         logging.debug("Open file %s" % filename)
-        with open(filename, 'r') as f:
+        with open(filename, 'r', encoding='utf-8-sig') as f:
             self.script_edit = f.read()
         self.textWidget.setPlainText(self.script_edit)
 

@@ -72,7 +72,7 @@ class IniFile(object):
             filedefaults = []
             self.original_filename = filename
             comments = []
-            with open(filename) as textFileHandle:
+            with open(filename, encoding='utf-8-sig') as textFileHandle:
                 # Remove blank lines and comment lines from the python list of lists.
                 for line in textFileHandle:
                     s = line.strip()
@@ -137,7 +137,7 @@ class IniFile(object):
             filename = self.original_filename
         if not filename:
             raise IniError('No filename for iniFile.saveFile()')
-        with open(filename, 'w') as f:
+        with open(filename, 'w', encoding='utf-8') as f:
             f.write(str(self))
 
     def fileLines(self):

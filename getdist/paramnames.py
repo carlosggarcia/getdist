@@ -319,7 +319,7 @@ class ParamList(object):
                 self.parWithName(name).renames = rename
 
     def fileList(self, fname):
-        with open(fname) as f:
+        with open(fname, encoding='utf-8-sig') as f:
             textFileLines = f.readlines()
         return textFileLines
 
@@ -376,7 +376,7 @@ class ParamList(object):
 
         :param filename: filename to save to
         """
-        with open(filename, 'w') as f:
+        with open(filename, 'w', encoding='utf-8') as f:
             f.write(str(self))
 
 
@@ -400,7 +400,7 @@ class ParamNames(ParamList):
         self.filenameLoadedFrom = os.path.split(fileName)[1]
         extension = os.path.splitext(fileName)[-1]
         if extension == '.paramnames':
-            with open(fileName) as f:
+            with open(fileName, encoding='utf-8-sig') as f:
                 self.names = [ParamInfo(line) for line in [s.strip() for s in f] if line != '']
         elif extension.lower() in ('.yaml', '.yml'):
             from getdist import yaml_tools

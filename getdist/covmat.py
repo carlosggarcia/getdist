@@ -1,5 +1,4 @@
 import numpy as np
-import io
 
 
 class CovMat(object):
@@ -29,7 +28,7 @@ class CovMat(object):
         return " ".join(self.paramNames)
 
     def loadFromFile(self, filename):
-        with open(filename) as f:
+        with open(filename, encoding="utf-8-sig") as f:
             first = f.readline().strip()
             if first.startswith('#'):
                 self.paramNames = first[1:].split()
@@ -44,7 +43,7 @@ class CovMat(object):
 
         :param filename: name of file to save to (.covmat)
         """
-        with io.open(filename, 'wb') as fout:
+        with open(filename, 'wb') as fout:
             fout.write(('# ' + self.paramNameString() + '\n').encode('UTF-8'))
             np.savetxt(fout, self.matrix, '%15.7E')
 

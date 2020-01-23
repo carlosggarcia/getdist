@@ -794,7 +794,7 @@ class MCSamples(Chains):
             PCAtext += '   (%s)\n' % (self.parLabel(j))
 
         if writeDataToFile:
-            with open(filename or self.rootdirname + ".PCA", "w") as f:
+            with open(filename or self.rootdirname + ".PCA", "w", encoding='utf-8') as f:
                 f.write(PCAtext)
         if n_best_only:
             if n_best_only == 1:
@@ -1125,7 +1125,7 @@ class MCSamples(Chains):
                         lines += " %s\n" % label
 
         if writeDataToFile:
-            with open(filename or (self.rootdirname + '.converge'), 'w') as f:
+            with open(filename or (self.rootdirname + '.converge'), 'w', encoding='utf-8') as f:
                 f.write(lines)
         return lines
 
@@ -2503,7 +2503,7 @@ class MCSamples(Chains):
         :param tag: Tag used for the filename the created file will export to.
         :param ext: The extension for the filename, Default if None
         """
-        with open(filename, 'w') as f:
+        with open(filename, 'w', encoding='utf-8') as f:
             f.write("import getdist.plots as plots, os\n")
             f.write("g=plots.GetDistPlotter(chain_dir=r'%s')\n" % (self.batch_path or os.path.dirname(self.root)))
 

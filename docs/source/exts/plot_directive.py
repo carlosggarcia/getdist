@@ -665,7 +665,7 @@ def run(arguments, content, options, state_machine, state, lineno):
         else:
             function_name = None
 
-        with io.open(source_file_name, 'r', encoding='utf-8') as fd:
+        with open(source_file_name, 'r', encoding='utf-8-sih') as fd:
             code = fd.read()
         output_base = os.path.basename(source_file_name)
     else:
@@ -810,7 +810,7 @@ def run(arguments, content, options, state_machine, state, lineno):
 
     # copy script (if necessary)
     target_name = os.path.join(dest_dir, output_base + source_ext)
-    with io.open(target_name, 'w', encoding="utf-8") as f:
+    with open(target_name, 'w', encoding="utf-8") as f:
         if source_file_name == rst_file:
             code_escaped = unescape_doctest(code)
         else:

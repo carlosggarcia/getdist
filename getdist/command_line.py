@@ -2,7 +2,6 @@ import os
 import subprocess
 import getdist
 import sys
-import io
 import logging
 from getdist import MCSamples, chains, IniFile
 
@@ -298,12 +297,12 @@ def getdist_script(args, exit_on_error=True):
 
 
 def make_param_file(file_name, feedback=True):
-    with io.open(getdist.distparam_template) as f:
+    with open(getdist.distparam_template, encoding="utf-8-sig") as f:
         content = f.read()
-    with io.open(getdist.default_getdist_settings) as f:
+    with open(getdist.default_getdist_settings, encoding="utf-8-sig") as f:
         analysis = f.read()
     content = content.replace('%%%ANALYSIS_DEFAULTS%%%', analysis)
-    with io.open(file_name, 'w') as f:
+    with open(file_name, 'w', encoding="utf-8") as f:
         f.write(content)
     if feedback:
         print('Template .ini file written to ' + file_name)

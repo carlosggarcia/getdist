@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-
-import io
+from __future__ import print_function
 import re
 import os
 import sys
@@ -11,14 +10,12 @@ except ImportError:
     from distutils.core import setup
 
 if sys.version_info[0] == 2:
-    from __future__ import print_function
-
     print('getdist no longer support Python 2, please upgrade to Python 3')
     sys.exit(1)
 
 
 def find_version():
-    version_file = io.open(os.path.join(os.path.dirname(__file__), 'getdist/__init__.py')).read()
+    version_file = open(os.path.join(os.path.dirname(__file__), 'getdist/__init__.py')).read()
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
     if version_match:
         return version_match.group(1)
@@ -26,7 +23,7 @@ def find_version():
 
 
 def get_long_description():
-    with open('README.rst') as f:
+    with open('README.rst',  encoding="utf-8-sig") as f:
         lines = f.readlines()
         i = -1
         while '=====' not in lines[i]:
@@ -69,19 +66,19 @@ if sys.platform == "darwin":
                                os.path.join(file_dir, app_name))
             fname = os.path.join(file_dir, app_name + '/Contents/MacOS/GetDistGUI')
             out = []
-            with io.open(fname, 'r') as f:
+            with open(fname, 'r') as f:
                 for line in f.readlines():
                     if 'python=' in line:
                         out.append('python="%s"' % sys.executable)
                     else:
                         out.append(line.strip())
-            with io.open(fname, 'w') as f:
+            with open(fname, 'w') as f:
                 f.write("\n".join(out))
             subprocess.call('chmod +x "%s"' % fname, shell=True)
             fname = os.path.join(file_dir, app_name + '/Contents/Info.plist')
-            with io.open(fname, 'r') as f:
+            with open(fname, 'r') as f:
                 plist = f.read().replace('1.0.0', find_version())
-            with io.open(fname, 'w') as f:
+            with open(fname, 'w') as f:
                 f.write(plist)
 
 
