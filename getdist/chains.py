@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import random
 import numpy as np
@@ -7,14 +6,13 @@ from getdist.paramnames import ParamNames, ParamInfo, escapeLatex
 from getdist.convolve import autoConvolve
 from getdist import cobaya_interface
 import pickle
-import six
 import logging
 from copy import deepcopy
 
 # whether to write to terminal chain names and burn in details when loaded from file
 print_load_details = True
 
-_int_types = six.integer_types + (np.integer,)
+_int_types = (int, np.integer)
 
 try:
     import pandas
@@ -1010,7 +1008,7 @@ class Chains(WeightedSamples):
         if renames is not None:
             self.updateRenames(renames)
         # Sampler that generated the chain -- assume "mcmc"
-        if isinstance(sampler, six.string_types):
+        if isinstance(sampler, str):
             self.setSampler(sampler)
         else:
             self.sampler = "mcmc"
@@ -1031,7 +1029,7 @@ class Chains(WeightedSamples):
         self.paramNames = None
         if isinstance(names, ParamNames):
             self.paramNames = deepcopy(names)
-        elif isinstance(names, six.string_types):
+        elif isinstance(names, str):
             self.paramNames = ParamNames(names)
         elif names is not None:
             self.paramNames = ParamNames(names=names)
@@ -1090,7 +1088,7 @@ class Chains(WeightedSamples):
         """
         if isinstance(name, ParamInfo):
             name = name.name
-        if isinstance(name, six.string_types):
+        if isinstance(name, str):
             name = self.index.get(name, None)
             if name is None:
                 return None, None
@@ -1163,7 +1161,7 @@ class Chains(WeightedSamples):
             self.updateBaseStatistics()
         if isinstance(par, ParamInfo):
             par = par.name
-        if isinstance(par, six.string_types):
+        if isinstance(par, str):
             return self.samples[:, self.index[par]]
         return WeightedSamples._makeParamvec(self, par)
 
@@ -1220,11 +1218,11 @@ class Chains(WeightedSamples):
                     "min_weight_ratio": self.min_weight_ratio}
         if hasattr(files_or_samples, '__len__') and not len(files_or_samples) or files_or_samples is None:
             raise ValueError('files_or_samples empty in loadChains')
-        if isinstance(files_or_samples, six.string_types) or isinstance(files_or_samples[0], six.string_types):
+        if isinstance(files_or_samples, str) or isinstance(files_or_samples[0], str):
             # From files
             if weights is not None or loglikes is not None:
                 raise ValueError('weights and loglikes not needed reading from file')
-            if isinstance(files_or_samples, six.string_types):
+            if isinstance(files_or_samples, str):
                 files_or_samples = [files_or_samples]
             self.name_tag = self.name_tag or os.path.basename(root)
             for fname in files_or_samples:

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from __future__ import absolute_import
 import io
 import re
 import os
@@ -10,6 +9,12 @@ try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
+
+if sys.version_info[0] == 2:
+    from __future__ import print_function
+
+    print('getdist no longer support Python 2, please upgrade to Python 3')
+    sys.exit(1)
 
 
 def find_version():
@@ -39,10 +44,7 @@ if sys.platform == "darwin":
     # Mac wrapper .app bundle
     try:
         # Just check for errors, and skip if no valid PySide
-        if sys.version_info[0] == 3:
-            from PySide2 import QtCore
-        else:
-            import PySide
+        from PySide2 import QtCore
     except ImportError as e:
         print("Cannot load PySide or PySide2 - skipping MacOS GetDist GUI app %s" % e)
     else:
@@ -139,7 +141,6 @@ setup(name='GetDist',
       install_requires=[
           'numpy',
           'matplotlib (>=2.2.0)',
-          'six',
           "scipy (>=1.0.0)"],
       # PySide or pyside2 is needed for the GUI
       # pandas optional (for faster txt chain file read)
@@ -149,13 +150,11 @@ setup(name='GetDist',
           'Development Status :: 5 - Production/Stable',
           'Operating System :: OS Independent',
           'Intended Audience :: Science/Research',
-          "Programming Language :: Python :: 2",
-          'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3',
           'Programming Language :: Python :: 3.6',
           'Programming Language :: Python :: 3.7',
           'Programming Language :: Python :: 3.8',
       ],
-      python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*',
+      python_requires='>=3.6',
       keywords=['MCMC', 'KDE', 'sample', 'density estimation', 'plot', 'figure']
       )

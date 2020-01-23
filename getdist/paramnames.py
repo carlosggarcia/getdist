@@ -1,8 +1,5 @@
-# AL 2011-2017
-from __future__ import absolute_import
 import os
 import fnmatch
-import six
 from itertools import chain
 from collections import OrderedDict
 
@@ -262,7 +259,7 @@ class ParamList(object):
         :param renames: optional dictionary giving mappings of parameter names
         """
         res = []
-        if isinstance(names, six.string_types):
+        if isinstance(names, str):
             names = [names]
         errors = makeList(error)
         if len(errors) < len(names):

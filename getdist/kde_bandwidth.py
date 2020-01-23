@@ -1,14 +1,6 @@
-from __future__ import print_function
 import numpy as np
 from scipy import fftpack
-
-try:
-    from scipy.optimize import fsolve, brentq, minimize
-except ImportError:
-    print('Install scipy version 11 or higher (or e.g. module load python 2.7.5 or higher which is '
-          'likely linked to later scipy)')
-    raise
-
+from scipy.optimize import fsolve, brentq, minimize
 from getdist.convolve import dct2d
 import logging
 import warnings

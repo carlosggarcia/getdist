@@ -1,11 +1,8 @@
-from __future__ import absolute_import
-from __future__ import print_function
 import decimal
 import os
 from io import BytesIO
 import numpy as np
 from getdist import paramnames
-import six
 import tempfile
 from collections import OrderedDict
 
@@ -14,7 +11,7 @@ _sci_tolerance = 4
 
 class TextFile(object):
     def __init__(self, lines=None):
-        if isinstance(lines, six.string_types):
+        if isinstance(lines, str):
             lines = [lines]
         self.lines = lines or []
 
@@ -290,7 +287,7 @@ class ResultTable(object):
         else:
             self.format = formatter
         self.ncol = ncol
-        if isinstance(results, six.string_types):
+        if isinstance(results, str):
             results = [results]
         if tableParamNames is None:
             self.tableParamNames = results[0]
@@ -554,14 +551,14 @@ class BestFit(ParamResults):
 
     def sortedChiSquareds(self):
         likes = dict()
-        for (kind, val) in self.chiSquareds:
+        for kind, val in self.chiSquareds:
             if kind not in likes:
                 likes[kind] = []
             likes[kind].append(val)
-        return sorted(six.iteritems(likes))
+        return sorted(iter(likes.items()))
 
     def chiSquareForKindName(self, kind, name):
-        for (akind, val) in self.chiSquareds:
+        for akind, val in self.chiSquareds:
             if akind == kind and val.name == name:
                 return val.chisq
         return None

@@ -1,10 +1,7 @@
-from __future__ import absolute_import
-from __future__ import print_function
 import os
 import copy
 import matplotlib
 import sys
-import six
 import warnings
 import logging
 
@@ -225,7 +222,7 @@ class GetDistPlotSettings(_BaseObject):
 
     def _numerical_fontsize(self, size):
         size = size or self.fontsize or 11
-        if isinstance(size, six.string_types):
+        if isinstance(size, str):
             scale = font_scalings.get(size)
             return self.fontsize * (scale or 1)
         return size or self.fontsize
@@ -388,7 +385,7 @@ class MCSampleAnalysis(_BaseObject):
         self.ini = None
         self.chain_settings_have_priority = True
         if chain_locations is not None:
-            if isinstance(chain_locations, six.string_types) or not hasattr(chain_locations, '__len__'):
+            if isinstance(chain_locations, str) or not hasattr(chain_locations, '__len__'):
                 chain_locations = [chain_locations]
             for chain_dir in chain_locations:
                 self.add_chain_dir(chain_dir)
@@ -400,7 +397,7 @@ class MCSampleAnalysis(_BaseObject):
 
         :param chain_dir: The root directory to add
         """
-        if isinstance(chain_dir, six.string_types):
+        if isinstance(chain_dir, str):
             chain_dir = os.path.normpath(chain_dir)
         if chain_dir in self.chain_locations:
             return
@@ -464,7 +461,7 @@ class MCSampleAnalysis(_BaseObject):
             return root
         if isinstance(root, MixtureND):
             raise GetDistPlotError('MixtureND is a distribution not a set of samples')
-        elif not isinstance(root, six.string_types):
+        elif not isinstance(root, str):
             raise GetDistPlotError('Root names must be strings (or MCSamples instances)')
         if root in self.mcsamples and cache:
             return self.mcsamples[root]
@@ -782,7 +779,7 @@ class GetDistPlotter(_BaseObject):
             res = self._get_color_at_index(self.settings.line_styles, plotno)
             if matplotlib.colors.is_color_like(res):
                 return '-', res
-            if isinstance(res, six.string_types):
+            if isinstance(res, str):
                 i = 0
                 while i < len(res) and res[i] in ['-', '.', ':']:
                     i += 1
@@ -833,7 +830,7 @@ class GetDistPlotter(_BaseObject):
         :param i: index, or None to return the color array
         :return: color or array of colors
         """
-        if isinstance(colors, six.string_types):
+        if isinstance(colors, str):
             colormap = getattr(cm, colors, None)
             if colormap is None:
                 raise GetDistPlotError('Unknown matplotlib colormap %s' % colors)
@@ -1066,7 +1063,7 @@ class GetDistPlotter(_BaseObject):
                 if color is None:
                     color = self._get_color_at_index(self.settings.solid_colors,
                                                      (of - plotno - 1) if of is not None else plotno)
-                if isinstance(color, six.string_types) or matplotlib.colors.is_color_like(color):
+                if isinstance(color, str) or matplotlib.colors.is_color_like(color):
                     cols = self._get_paler_colors(color, len(contour_levels))
                 else:
                     cols = color
@@ -1746,7 +1743,7 @@ class GetDistPlotter(_BaseObject):
         if params is None or len(params) == 0:
             return names.names
         # Fail only for parameters for which a string was passed
-        if isinstance(params, six.string_types):
+        if isinstance(params, str):
             error = True
         else:
             is_param_info = [isinstance(param, ParamInfo) for param in params]
@@ -1964,7 +1961,7 @@ class GetDistPlotter(_BaseObject):
             root = escapeLatex(root.get_name())
         elif hasattr(root, 'getName'):
             root = escapeLatex(root.getName())
-        elif isinstance(root, six.string_types):
+        elif isinstance(root, str):
             label = self._root_display_name(self.sample_analyser.samples_for_root(root), i)
             if label in root and '/' in root:
                 return escapeLatex(root)
@@ -2159,7 +2156,7 @@ class GetDistPlotter(_BaseObject):
         if isinstance(ax, int):
             ax = self._subplot_number(ax)
         elif isinstance(ax, (list, tuple)):
-            if isinstance(ax[0], six.string_types) or isinstance(ax[0], ParamInfo):
+            if isinstance(ax[0], str) or isinstance(ax[0], ParamInfo):
                 ax = self.get_axes_for_params(*ax)
             else:
                 ax = self._subplot(ax[1], ax[0])

@@ -125,17 +125,10 @@ The plot directive has the following configuration options:
     plot_template
         Provide a customized template for preparing restructured text.
 """
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
-import six
 
 import sys, os, shutil, io, re, textwrap
 from os.path import relpath
 import traceback
-
-if not six.PY3:
-    import cStringIO
 
 from docutils.parsers.rst import directives
 from docutils.parsers.rst.directives.images import Image
@@ -219,7 +212,7 @@ def mark_plot_labels(app, document):
     the "htmlonly" (or "latexonly") node to the actual figure node
     itself.
     """
-    for name, explicit in six.iteritems(document.nametypes):
+    for name, explicit in document.nametypes.items():
         if not explicit:
             continue
         labelid = document.nameids[name]
@@ -339,7 +332,7 @@ def split_code_at_show(text):
 
 def remove_coding(text):
     """
-    Remove the coding comment, which six.exec_ doesn't like.
+    Remove the coding comment, which exec doesn't like.
     """
     return re.sub(
         r"^#\s*-\*-\s*coding:\s*.*-\*-$", "", text, flags=re.MULTILINE)
@@ -459,10 +452,7 @@ def run_code(code, code_path, ns=None, function_name=None):
     # Change the working directory to the directory of the example, so
     # it can get at its data files, if any.  Add its path to sys.path
     # so it can import any helper modules sitting beside it.
-    if six.PY2:
-        pwd = os.getcwdu()
-    else:
-        pwd = os.getcwd()
+    pwd = os.getcwd()
     old_sys_path = list(sys.path)
     if setup.config.plot_working_directory is not None:
         try:
@@ -487,10 +477,7 @@ def run_code(code, code_path, ns=None, function_name=None):
 
     # Redirect stdout
     stdout = sys.stdout
-    if six.PY3:
-        sys.stdout = io.StringIO()
-    else:
-        sys.stdout = cStringIO.StringIO()
+    sys.stdout = io.StringIO()
 
     # Assign a do-nothing print function to the namespace.  There
     # doesn't seem to be any other way to provide a way to (not) print
@@ -500,22 +487,23 @@ def run_code(code, code_path, ns=None, function_name=None):
 
     try:
         try:
+
             code = unescape_doctest(code)
             if ns is None:
                 ns = {}
             if not ns:
                 if setup.config.plot_pre_code is None:
-                    six.exec_(six.text_type("import numpy as np\n" +
-                                            "from matplotlib import pyplot as plt\n"), ns)
+                    exec(str("import numpy as np\n" +
+                             "from matplotlib import pyplot as plt\n"), ns)
                 else:
-                    six.exec_(six.text_type(setup.config.plot_pre_code), ns)
+                    exec(str(setup.config.plot_pre_code), ns)
             ns['print'] = _dummy_print
             if "__main__" in code:
-                six.exec_("__name__ = '__main__'", ns)
+                exec("__name__ = '__main__'", ns)
             code = remove_coding(code)
-            six.exec_(code, ns)
+            exec(code, ns)
             if function_name is not None:
-                six.exec_(function_name + "()", ns)
+                exec(function_name + "()", ns)
         except (Exception, SystemExit) as err:
             raise PlotError(traceback.format_exc())
     finally:
@@ -546,10 +534,10 @@ def render_figures(code, code_path, output_dir, output_base, context,
     default_dpi = {'png': 80, 'hires.png': 200, 'pdf': 200}
     formats = []
     plot_formats = config.plot_formats
-    if isinstance(plot_formats, six.string_types):
+    if isinstance(plot_formats, str):
         plot_formats = eval(plot_formats)
     for fmt in plot_formats:
-        if isinstance(fmt, six.string_types):
+        if isinstance(fmt, str):
             formats.append((fmt, default_dpi.get(fmt, 80)))
         elif type(fmt) in (tuple, list) and len(fmt) == 2:
             formats.append((str(fmt[0]), int(fmt[1])))
@@ -774,7 +762,7 @@ def run(arguments, content, options, state_machine, state, lineno):
         if nofigs:
             images = []
 
-        opts = [':%s: %s' % (key, val) for key, val in six.iteritems(options)
+        opts = [':%s: %s' % (key, val) for key, val in options.items()
                 if key in ('alt', 'height', 'width', 'scale', 'align', 'class')]
 
         only_html = ".. only:: html"

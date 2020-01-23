@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
 import os
 import copy
 import logging
@@ -11,7 +10,6 @@ import sys
 import signal
 import warnings
 from io import BytesIO
-import six
 from collections import OrderedDict
 from getdist.gui.qt_import import pyside_version
 
@@ -165,7 +163,7 @@ class MainWindow(QMainWindow):
 
         if dirs is None and last_dir:
             dirs = [last_dir]
-        elif isinstance(dirs, six.string_types):
+        elif isinstance(dirs, str):
             dirs = [dirs]  # QSettings doesn't save single item lists reliably
         if dirs is not None:
             dirs = [x for x in dirs if os.path.exists(x)]
@@ -866,10 +864,10 @@ class MainWindow(QMainWindow):
             settings = self.default_plot_settings
             self.custom_plot_settings = {}
             deleted = []
-            for key, value in six.iteritems(vals):
+            for key, value in vals.items():
                 current = getattr(settings, key)
                 if str(current) != value and len(value):
-                    if isinstance(current, six.string_types):
+                    if isinstance(current, str):
                         self.custom_plot_settings[key] = value
                     else:
                         try:
@@ -891,8 +889,8 @@ class MainWindow(QMainWindow):
             # Try to update current plot script text
             script = self.textWidget.toPlainText().split("\n")
             if self.custom_plot_settings:
-                for key, value in six.iteritems(self.custom_plot_settings):
-                    if isinstance(value, six.string_types):
+                for key, value in self.custom_plot_settings.items():
+                    if isinstance(value, str):
                         value = '"' + value + '"'
                     script_set = 'g.settings.%s =' % key
                     script_line = '%s %s' % (script_set, value)
@@ -1511,8 +1509,8 @@ class MainWindow(QMainWindow):
                 script += "g=plots.%schain_dir=%s)\n" % (plot_func, chain_dirs)
 
             if self.custom_plot_settings:
-                for key, value in six.iteritems(self.custom_plot_settings):
-                    if isinstance(value, six.string_types):
+                for key, value in self.custom_plot_settings.items():
+                    if isinstance(value, str):
                         value = '"' + value + '"'
                     script += 'g.settings.%s = %s\n' % (key, value)
 
@@ -1780,7 +1778,7 @@ class MainWindow(QMainWindow):
             localdic = {}
             exec(script_exec, globaldic, localdic)
 
-            for v in six.itervalues(localdic):
+            for v in localdic.items():
                 if isinstance(v, plots.GetDistPlotter):
                     self.updateScriptPreview(v)
                     break

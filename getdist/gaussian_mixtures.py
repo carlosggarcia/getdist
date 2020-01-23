@@ -1,9 +1,7 @@
-from __future__ import absolute_import
 import numpy as np
 from getdist.densities import Density1D, Density2D
 from getdist.paramnames import ParamNames
 from getdist.mcsamples import MCSamples
-import six
 import copy
 
 
@@ -152,7 +150,7 @@ class MixtureND(object):
         :param no_limit_marge: if true don't raise an error if mixture has limits
         :return: marginalized 1D pdf at x
         """
-        if isinstance(index, six.string_types):
+        if isinstance(index, str):
             index = self.names.index(index)
         if not no_limit_marge:
             self.checkNoLimits([index])
@@ -177,7 +175,7 @@ class MixtureND(object):
         :param no_limit_marge: if true don't raise error if limits on other parameters
         :return: :class:`~.densities.Density1D` instance
         """
-        if isinstance(index, six.string_types):
+        if isinstance(index, str):
             index = self.names.index(index)
         if not no_limit_marge:
             self.checkNoLimits([index])
@@ -214,7 +212,7 @@ class MixtureND(object):
         if params is None:
             params = self.names
         for p in params:
-            if isinstance(p, six.string_types):
+            if isinstance(p, str):
                 indices.append(self.names.index(p))
             elif hasattr(p, 'name'):
                 indices.append(self.names.index(p.name))
@@ -419,9 +417,9 @@ class GaussianND(MixtureND):
         :param is_inv_cov: set True if cov is actually an inverse covariance
         :param kwargs: arguments passed to :class:`MixtureND`
         """
-        if isinstance(mean, six.string_types):
+        if isinstance(mean, str):
             mean = np.loadtxt(mean)
-        if isinstance(cov, six.string_types):
+        if isinstance(cov, str):
             cov = np.loadtxt(cov)
         if is_inv_cov:
             cov = np.linalg.inv(cov)

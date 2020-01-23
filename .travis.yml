@@ -10,10 +10,6 @@ matrix:
     - env:
         - CHANNEL="defaults"
         - PYDIST="ANACONDA"
-      python: "2.7"
-    - env:
-        - CHANNEL="defaults"
-        - PYDIST="ANACONDA"
       python: "3.6"
     - env:
         - CHANNEL="conda-forge"
@@ -21,7 +17,7 @@ matrix:
       python: "3.8"
     - name: "3.7 with bionic"
       python: "3.7"
-      
+
 install:
   # Setup anaconda following http://conda.pydata.org/docs/travis.html
   - if [[ "$PYDIST" == "ANACONDA" ]]; then
@@ -33,7 +29,7 @@ install:
       conda info -a;
       conda create -q -n test-environment -c $CHANNEL python=$TRAVIS_PYTHON_VERSION scipy matplotlib;
       source activate test-environment;
-    fi  
+    fi
   - python --version
   - pip install .
   - pip install PyYAML

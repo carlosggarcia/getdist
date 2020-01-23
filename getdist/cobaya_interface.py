@@ -1,8 +1,6 @@
 # JT 2017-19
 
-from __future__ import division
 from importlib import import_module
-from six import string_types
 from copy import deepcopy
 import logging
 from collections import OrderedDict as odict
@@ -43,7 +41,7 @@ def cobaya_params_file(root):
 
 
 def yaml_file_or_dict(file_or_dict):
-    if isinstance(file_or_dict, string_types):
+    if isinstance(file_or_dict, str):
         from getdist.yaml_tools import yaml_load_file
         return yaml_load_file(file_or_dict)
     else:
@@ -229,7 +227,7 @@ def expand_info_param(info_param):
         info_param[_p_derived] = True
     # Dynamical input parameters: save as derived by default
     value = info_param.get(_p_value, None)
-    if isinstance(value, string_types) or callable(value):
+    if isinstance(value, str) or callable(value):
         info_param[_p_derived] = info_param.get(_p_derived, True)
     return info_param
 

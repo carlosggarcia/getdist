@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from .qt_import import pyside_version
 
 if pyside_version == 2:

@@ -1,12 +1,8 @@
 # JT 2017-19
 
-from __future__ import division
 import re
 from collections import OrderedDict as odict
-import six
 
-if six.PY2:
-    ModuleNotFoundError = ImportError
 try:
     import yaml
 except ModuleNotFoundError:

@@ -1,9 +1,5 @@
-from __future__ import absolute_import
-from __future__ import print_function
-# AL 2011-2015
 import os
 import numpy as np
-import six
 
 
 class IniError(Exception):
@@ -40,7 +36,7 @@ class IniFile(object):
         self.includes = []
         self.original_filename = None
         self.expand_environment_variables = expand_environment_variables
-        if isinstance(settings, six.string_types):
+        if isinstance(settings, str):
             self.readFile(settings, keep_includes)
         elif hasattr(settings, "keys"):
             self.params.update(settings)
@@ -349,7 +345,7 @@ class IniFile(object):
                 return [tp(x) for x in self.params[name]]
 
         s = self.string(name, default)
-        if isinstance(s, six.string_types):
+        if isinstance(s, str):
             if tp is not None:
                 return [tp(x) for x in s.split()]
             return s.split()

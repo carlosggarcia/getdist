@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-from __future__ import print_function
 import os
 import glob
 import logging
@@ -8,7 +6,6 @@ import pickle
 import math
 import time
 import numpy as np
-import six
 from scipy.stats import norm
 import getdist
 from getdist import chains, types, covmat, ParamInfo, IniFile, ParamNames, cobaya_interface
@@ -322,7 +319,7 @@ class MCSamples(Chains):
         :param i: The index or name of a parameter.
         :return: The parameter's label.
         """
-        if isinstance(i, six.string_types):
+        if isinstance(i, str):
             return self.paramNames.parWithName(i).label
         else:
             return self.paramNames.names[i].label
@@ -441,7 +438,7 @@ class MCSamples(Chains):
         assert (settings is None or hasattr(settings, "keys"))
         if not ini:
             ini = self.ini
-        elif isinstance(ini, six.string_types):
+        elif isinstance(ini, str):
             ini = IniFile(ini)
         else:
             ini = copy.deepcopy(ini)
@@ -1301,7 +1298,7 @@ class MCSamples(Chains):
         return hx, hy, c
 
     def _initParamRanges(self, j, paramConfid=None):
-        if isinstance(j, six.string_types):
+        if isinstance(j, str):
             j = self.index[j]
         paramVec = self.samples[:, j]
         return self._initParam(self.paramNames.names[j], paramVec, self.means[j], self.sddev[j], paramConfid)
@@ -2143,7 +2140,7 @@ class MCSamples(Chains):
         :return: labels, texs: a list of parameter labels, and a list of tex snippets,
                                or for a single parameter, the latex snippet.
         """
-        if isinstance(params, six.string_types):
+        if isinstance(params, str):
             return self.getInlineLatex(params, limit, err_sig_figs)
 
         marge = self.getMargeStats()
