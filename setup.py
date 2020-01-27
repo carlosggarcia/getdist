@@ -43,7 +43,7 @@ if sys.platform == "darwin":
         # Just check for errors, and skip if no valid PySide
         from PySide2 import QtCore
     except ImportError as e:
-        print("Cannot load PySide or PySide2 - skipping MacOS GetDist GUI app %s" % e)
+        print("Cannot load PySide2 - skipping MacOS GetDist GUI app %s" % e)
     else:
         sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -139,7 +139,7 @@ setup(name='GetDist',
           'numpy',
           'matplotlib (>=2.2.0)',
           "scipy (>=1.0.0)"],
-      # PySide or pyside2 is needed for the GUI
+      # PySide2 is needed for the GUI
       # pandas optional (for faster txt chain file read)
       extras_require={'GUI': ["PySide2>=5.2"], 'txt': ["pandas>=0.14.0"]},
       cmdclass=cmd_class,

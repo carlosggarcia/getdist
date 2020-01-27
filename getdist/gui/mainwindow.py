@@ -10,13 +10,46 @@ import sys
 import signal
 import warnings
 from io import BytesIO
-from getdist.gui.qt_import import pyside_version
+
+matplotlib.use('Qt5Agg')
+
+try:
+    from PySide2 import QtCore
+except ImportError as e:
+    if 'DLL load failed' in str(e):
+        print('DLL load failed attempting to load PySide2: problem with your python configuration')
+    else:
+        print(e)
+        print("Can't import PySide2 modules, you need to install Pyside2")
+    if not os.path.exists(os.path.join(sys.prefix, 'conda-meta')):
+        print('Using Anaconda is probably the most reliable method')
+    print("E.g. make and use a new environment using conda-forge")
+    print('conda create -n py37forge -c conda-forge python=3.7 scipy pandas matplotlib PySide2')
+
+    sys.exit(-1)
+
 import getdist
 from getdist import plots, IniFile
 from getdist.chain_grid import ChainDirGrid, file_root_to_root, get_chain_root_files, load_supported_grid
 from getdist.mcsamples import SettingError, ParamError
+
 from getdist.gui.SyntaxHighlight import PythonHighlighter
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as QNavigationToolbar
+
+import PySide2
+from PySide2.QtGui import QIcon, QKeySequence, QFont, QTextOption, QPixmap, QImage
+from PySide2.QtCore import Qt, SIGNAL, QSize, QSettings, QCoreApplication
+from PySide2.QtWidgets import QListWidget, QMainWindow, QDialog, QApplication, QAbstractItemView, QAction, \
+    QTabWidget, QWidget, QComboBox, QPushButton, QShortcut, QCheckBox, QRadioButton, QGridLayout, QVBoxLayout, \
+    QSplitter, QHBoxLayout, QToolBar, QPlainTextEdit, QScrollArea, QFileDialog, QMessageBox, QTableWidgetItem, \
+    QLabel, QTableWidget, QListWidgetItem, QTextEdit
+
+os.environ['QT_API'] = 'pyside2'
+
+QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # DPI support
+QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 
 try:
     # If cosmomc is configured
@@ -24,40 +57,10 @@ try:
 except ImportError:
     batchjob = None
 
-if pyside_version == 2:
-    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-    from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as QNavigationToolbar
 
-    import PySide2 as PySide
-    from PySide2.QtGui import QIcon, QKeySequence, QFont, QTextOption, QPixmap, QImage
-    from PySide2.QtCore import Qt, SIGNAL, QSize, QSettings, QCoreApplication
-    from PySide2.QtWidgets import QListWidget, QMainWindow, QDialog, QApplication, QAbstractItemView, QAction, \
-        QTabWidget, QWidget, QComboBox, QPushButton, QShortcut, QCheckBox, QRadioButton, QGridLayout, QVBoxLayout, \
-        QSplitter, QHBoxLayout, QToolBar, QPlainTextEdit, QScrollArea, QFileDialog, QMessageBox, QTableWidgetItem, \
-        QLabel, QTableWidget, QListWidgetItem, QTextEdit
-
-    os.environ['QT_API'] = 'pyside2'
-
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # DPI support
-    QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
-
-
-    class NavigationToolbar(QNavigationToolbar):
-        def sizeHint(self):
-            return QToolBar.sizeHint(self)
-
-else:
-    from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-    from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
-
-    import PySide
-    from PySide.QtCore import Qt, SIGNAL, QSize, QSettings, QCoreApplication
-    from PySide.QtGui import QListWidget, QMainWindow, QDialog, QApplication, QAbstractItemView, QAction, \
-        QTabWidget, QWidget, QComboBox, QPushButton, QShortcut, QCheckBox, QRadioButton, QGridLayout, QVBoxLayout, \
-        QSplitter, QHBoxLayout, QToolBar, QPlainTextEdit, QScrollArea, QFileDialog, QMessageBox, QTableWidgetItem, \
-        QLabel, QTableWidget, QListWidgetItem, QTextEdit, QIcon, QKeySequence, QFont, QTextOption, QImage, QPixmap
-
-    os.environ['QT_API'] = 'pyside'
+class NavigationToolbar(QNavigationToolbar):
+    def sizeHint(self):
+        return QToolBar.sizeHint(self)
 
 
 class GuiSelectionError(Exception):
@@ -325,7 +328,7 @@ class MainWindow(QMainWindow):
         return os.path.join(os.path.dirname(__file__), 'images', name)
 
     def _icon(self, name, large=True):
-        if pyside_version > 1 and large:
+        if large:
             name = name + '_large'
         pm = QPixmap(self._image_file('%s.png' % name))
         if hasattr(pm, 'setDevicePixelRatio'):
@@ -976,11 +979,10 @@ class MainWindow(QMainWindow):
                           "\nMatplotlib: " + matplotlib.__version__ +
                           "\nSciPy: " + scipy.__version__ +
                           "\nNumpy: " + np.__version__ +
-                          "\nPySide: " + PySide.__version__ +
-                          "\nQt (PySide): " + PySide.QtCore.__version__ +
-                          ("" if pyside_version == 1 else
-                           "\n\nPix ratio: %s; Logical dpi: %s, %s" % (
-                               self.devicePixelRatio(), self.logicalDpiX(), self.logicalDpiY())) +
+                          "\nPySide2: " + PySide2.__version__ +
+                          "\nQt (PySide): " + PySide2.QtCore.__version__ +
+                          "\n\nPix ratio: %s; Logical dpi: %s, %s" % (
+                              self.devicePixelRatio(), self.logicalDpiX(), self.logicalDpiY()) +
                           '\nUsing getdist at: %s' % os.path.dirname(getdist.__file__))
 
     def getDirectories(self):
@@ -1696,10 +1698,8 @@ class MainWindow(QMainWindow):
             if hasattr(self, "toolbar"):
                 del self.toolbar
             self.canvas = FigureCanvas(self.plotter.fig)
-            if pyside_version > 1 or sys.platform != "darwin":
-                # for some reason the toolbar used to crash on a Mac
-                self.toolbar = NavigationToolbar(self.canvas, self)
-                self.plotWidget.layout().addWidget(self.toolbar)
+            self.toolbar = NavigationToolbar(self.canvas, self)
+            self.plotWidget.layout().addWidget(self.toolbar)
             self.plotWidget.layout().addWidget(self.canvas)
             self.plotWidget.show()
 
@@ -1819,7 +1819,7 @@ class MainWindow(QMainWindow):
             format='png',
             edgecolor='w',
             facecolor='w',
-            dpi=96 if pyside_version == 1 else self.logicalDpiX() * self.devicePixelRatio(),
+            dpi=self.logicalDpiX() * self.devicePixelRatio(),
             bbox_extra_artists=plotter.extra_artists,
             bbox_inches='tight')
         buf.seek(0)
@@ -1827,8 +1827,7 @@ class MainWindow(QMainWindow):
         image = QImage.fromData(buf.getvalue())
 
         pixmap = QPixmap.fromImage(image)
-        if pyside_version > 1:
-            pixmap.setDevicePixelRatio(self.devicePixelRatio())
+        pixmap.setDevicePixelRatio(self.devicePixelRatio())
         label = QLabel(self.scrollArea)
         label.setPixmap(pixmap)
 
@@ -2026,11 +2025,10 @@ class DialogParamTables(DialogTextOutput):
     def tabChanged(self, index):
         if not self.generated[index]:
             viewWidget = QWidget(self.tabs[index])
-            dpi = None if pyside_version == 1 else self.logicalDpiX() * self.devicePixelRatio()
+            dpi = self.logicalDpiX() * self.devicePixelRatio()
             buf = self.tables[index].tablePNG(bytesIO=True, dpi=dpi)
             pixmap = QPixmap.fromImage(QImage.fromData(buf.getvalue()))
-            if pyside_version > 1:
-                pixmap.setDevicePixelRatio(self.devicePixelRatio())
+            pixmap.setDevicePixelRatio(self.devicePixelRatio())
             label = QLabel(viewWidget)
             label.setPixmap(pixmap)
             layout = QGridLayout()
