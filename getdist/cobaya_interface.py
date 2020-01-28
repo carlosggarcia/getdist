@@ -122,7 +122,7 @@ def get_info_params(info):
     for p, pinfo in info_params.items():
         info_params_full[p] = info_params[p]
     # Add prior and likelihoods
-    priors = [_prior_1d_name] + list(info.get(_prior, []))
+    priors = [_prior_1d_name] + list(info.get(_prior) or [])
     likes = list(info.get(_likelihood))
     # Account for post
     remove = info.get(_post, {}).get("remove", {})

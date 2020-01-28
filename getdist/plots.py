@@ -5,7 +5,10 @@ import sys
 import warnings
 import logging
 
-matplotlib.use('Agg')
+if 'ipykern' not in matplotlib.rcParams['backend']:
+    # default to agg unless in notebook
+    matplotlib.use('Agg')
+
 import matplotlib.patches
 import matplotlib.colors
 import matplotlib.gridspec
