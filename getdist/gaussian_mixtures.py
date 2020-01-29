@@ -9,7 +9,7 @@ def make_2D_Cov(sigmax, sigmay, corr):
     return np.array([[sigmax ** 2, sigmax * sigmay * corr], [sigmax * sigmay * corr, sigmay ** 2]])
 
 
-class MixtureND(object):
+class MixtureND:
     """
     Gaussian mixture model with optional boundary ranges. Includes functions for generating samples and projecting.
     """

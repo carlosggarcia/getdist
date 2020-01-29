@@ -8,7 +8,7 @@ import tempfile
 _sci_tolerance = 4
 
 
-class TextFile(object):
+class TextFile:
     def __init__(self, lines=None):
         if isinstance(lines, str):
             lines = [lines]
@@ -86,7 +86,7 @@ def numberFigs(number, sigfig, sci=False):
     return ''.join(result)
 
 
-class NumberFormatter(object):
+class NumberFormatter:
     def __init__(self, sig_figs=4, separate_limit_tol=0.1, err_sf=2):
         self.sig_figs = sig_figs
         self.separate_limit_tol = separate_limit_tol
@@ -160,7 +160,7 @@ class NumberFormatter(object):
         return limit != 1 or abs(abs(upper / lower) - 1) > self.separate_limit_tol
 
 
-class TableFormatter(object):
+class TableFormatter:
     def __init__(self):
         self.border = '|'
         self.endofrow = '\\\\'
@@ -255,7 +255,7 @@ class NoLineTableFormatter(OpenTableFormatter):
         return r'\noalign{\vskip 3pt}\cline{2-' + str(colsPerParam * numResults + 1) + r'}\noalign{\vskip 3pt}'
 
 
-class ResultTable(object):
+class ResultTable:
     """
     Class for holding a latex table of parameter statistics
     """
@@ -469,7 +469,7 @@ class ParamResults(ParamList):
     pass
 
 
-class LikelihoodChi2(object):
+class LikelihoodChi2:
     pass
 
 
@@ -579,7 +579,7 @@ class BestFit(ParamResults):
         return res
 
 
-class ParamLimit(object):
+class ParamLimit:
     """
     Class containing information about a marginalized parameter limit.
 

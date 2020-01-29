@@ -137,7 +137,7 @@ K = np.array(
 Kodd = np.array([1] + [np.prod(np.arange(1, 2 * j, 2)) / 2. ** (j + 1) / np.sqrt(np.pi) for j in range(1, 9)])
 
 
-class KernelOptimizer2D(object):
+class KernelOptimizer2D:
     def __init__(self, data, Neff, correlation, do_correlation=True, fallback_t=None):
         size = data.shape[0]
         if size != data.shape[1]:

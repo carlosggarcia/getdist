@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class CovMat(object):
+class CovMat:
     """
     Class holding a covariance matrix for some named parameters
 

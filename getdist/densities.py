@@ -49,7 +49,7 @@ def getContourLevels(inbins, contours=defaultContours, missing_norm=0, half_edge
     return contour_levels
 
 
-class GridDensity(object):
+class GridDensity:
     """
     Base class for probability density grids (normalized or not)
 
@@ -169,7 +169,7 @@ class Density1D(GridDensity):
         return self.integrate(self.P)
 
     def initLimitGrids(self, factor=None):
-        class InterpGrid(object):
+        class InterpGrid:
             pass
 
         if self.spl is None:

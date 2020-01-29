@@ -121,7 +121,7 @@ def get1DMises(prob, nsamp=default_nsamp, nsim=50, scales=[0.6, 1.5, 0.1], setti
     return scales, Mises
 
 
-class Test1DDistributions(object):
+class Test1DDistributions:
     def __init__(self):
         self.gauss = Gaussian1D(0, 0.5, label='Gaussian')
         self.skew = Mixture1D([0, 1], [1, 0.4], [0.6, 0.4], label='skew')
@@ -146,7 +146,7 @@ class Test1DDistributions(object):
         return self.all
 
 
-class Test2DDistributions(object):
+class Test2DDistributions:
     def __init__(self):
         self.gauss = Gaussian2D([0, 0], (0.7, 1, 0.3), label='Gaussian')
 

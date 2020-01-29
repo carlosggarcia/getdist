@@ -6,7 +6,7 @@ class IniError(Exception):
     pass
 
 
-class IniFile(object):
+class IniFile:
     """
     Class for storing option parameter values and reading/saving to file
 

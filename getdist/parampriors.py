@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 
-class ParamBounds(object):
+class ParamBounds:
     """
     Class for holding list of parameter bounds (e.g. for plotting, or hard priors).
     A limit is None if not specified, denoted by 'N' if read from a string or file

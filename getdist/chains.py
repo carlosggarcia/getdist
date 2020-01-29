@@ -179,21 +179,21 @@ def covToCorr(cov, copy=True):
     return cov
 
 
-class ParamConfidenceData(object):
+class ParamConfidenceData:
     """
     a cache object for confidence interval data
     """
     pass
 
 
-class ParSamples(object):
+class ParSamples:
     """
     An object used as a container for named parameter sample arrays
     """
     pass
 
 
-class WeightedSamples(object):
+class WeightedSamples:
     """
     WeightedSamples is the base class for a set of weighted parameter samples
 

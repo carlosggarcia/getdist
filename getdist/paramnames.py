@@ -67,7 +67,7 @@ def mergeRenames(*dicts, **kwargs):
     return merged
 
 
-class ParamInfo(object):
+class ParamInfo:
     """
     Parameter information object.
 
@@ -146,7 +146,7 @@ class ParamInfo(object):
         return self.string()
 
 
-class ParamList(object):
+class ParamList:
     """
     Holds an orders list of :class:`ParamInfo` objects describing a set of parameters.
 

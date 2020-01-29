@@ -107,7 +107,7 @@ def loadMCSamples(file_root, ini=None, jobItem=None, no_cache=False, settings={}
     return samples
 
 
-class Kernel1D(object):
+class Kernel1D:
     def __init__(self, winw, h):
         self.winw = winw
         self.h = h

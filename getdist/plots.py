@@ -351,7 +351,7 @@ getSubplotPlotter = get_subplot_plotter
 getSinglePlotter = get_single_plotter
 
 
-class RootInfo(object):
+class RootInfo:
     """
     Class to hold information about a set of samples loaded from file
     """
@@ -2227,7 +2227,7 @@ class GetDistPlotter(_BaseObject):
 
     @staticmethod
     def _make_param_object(names, samples, obj=None):
-        class SampleNames(object):
+        class SampleNames:
             pass
 
         obj = obj or SampleNames()
@@ -3042,7 +3042,7 @@ class GetDistPlotter(_BaseObject):
 style_name = 'default'
 
 
-class StyleManager(object):
+class StyleManager:
     def __init__(self):
         self._plot_styles = {style_name: GetDistPlotter}
         self.active_style = style_name
