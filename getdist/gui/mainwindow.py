@@ -667,6 +667,7 @@ class MainWindow(QMainWindow):
             return
         try:
             self.showMessage("Calculating convergence stats....")
+            QApplication.setOverrideCursor(Qt.WaitCursor)
             samples = self.getSamples(rootname)
             stats = samples.getConvergeTests(samples.converge_test_limit)
             summary = samples.getNumSampleSummaryText()
@@ -678,6 +679,7 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self.errorReport(e, caption="Convergence stats")
         finally:
+            QApplication.restoreOverrideCursor()
             self.showMessage()
 
     def showPCA(self):

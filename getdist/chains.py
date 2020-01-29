@@ -516,13 +516,55 @@ class WeightedSamples(object):
         corr = np.zeros(maxoff + 1)
         corr[0] = np.dot(self.weights, self.weights)
         n = float(self.numrows)
-        for k in range(1, maxoff + 1):
-            diff2 = (d[:-k] - d[k:]) ** 2 / kernel_std ** 2
-            corr[k] = np.dot(np.exp(-diff2 / 4) * self.weights[:-k], self.weights[k:]) - (n - k) * uncorr_term
-            if corr[k] < min_corr * corr[0]:
-                corr[k] = 0
-                break
-        N = corr[0] + 2 * np.sum(corr[1:])
+
+        # Unoptimized calculation, slow for long correlation lengths
+        # for k in range(1, maxoff + 1):
+        #     diff2 = (d[:-k] - d[k:]) ** 2 / kernel_std ** 2
+        #     corr[k] = np.dot(np.exp(-diff2 / 4) * self.weights[:-k], self.weights[k:]) - (n - k) * uncorr_term
+        #     if corr[k] < min_corr * corr[0]:
+        #         corr[k] = 0
+        #         break
+        # N1 = corr[0] + 2 * np.sum(corr[1:])
+
+        def corr_k(k):
+            return np.dot(np.exp(-(d[:-k] - d[k:]) ** 2 / (4 * kernel_std ** 2)) * self.weights[:-k],
+                          self.weights[k:]) - (n - k) * uncorr_term
+
+        threshold = min_corr * corr[0]
+        corr[1] = corr_k(1)
+        if corr[1] < threshold:
+            N = corr[0]
+        else:
+            corr[2] = corr_k(2)
+            if corr[2] > threshold:
+                max_k = maxoff
+                # for large correlation lengths, for speed need to sample rather than doing every k
+                # find largest step for which correlation above threshold
+                while max_k > 10:
+                    test_val = corr_k(max_k // 3)
+                    if test_val >= threshold:
+                        break
+                    max_k //= 3
+
+                # does not need to be accurate
+                if max_k < 20:
+                    step_size = 1
+                else:
+                    step_size = max_k // 10
+
+                cum_sum = corr[1] + corr[2]
+                for k in range(3, maxoff + 1, step_size):
+                    test_val = corr_k(k)
+                    if test_val < threshold:
+                        break
+                    if k > 3:
+                        cum_sum += test_val * step_size
+                    else:
+                        cum_sum += (test_val * step_size) / 2
+                N = corr[0] + 2 * cum_sum
+            else:
+                N = corr[0] + 2 * corr[1]
+
         return self.get_norm() ** 2 / N
 
     def getEffectiveSamplesGaussianKDE_2d(self, i, j, h=0.3, maxoff=None, min_corr=0.05):
