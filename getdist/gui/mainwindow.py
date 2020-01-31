@@ -69,7 +69,7 @@ class GuiSelectionError(Exception):
 
 class QStatusLogger(logging.Handler):
     def __init__(self, parent):
-        super(QStatusLogger, self).__init__(level=logging.WARNING)
+        super().__init__(level=logging.WARNING)
         self.widget = parent
 
     def emit(self, record):
@@ -94,7 +94,7 @@ class RootListWidget(QListWidget):
         self.owner = owner
 
     def dropEvent(self, event):
-        super(RootListWidget, self).dropEvent(event)
+        super().dropEvent(event)
         self.owner._updateParameters()
 
 
@@ -103,7 +103,7 @@ class MainWindow(QMainWindow):
         """
         Initialize of GUI components.
         """
-        super(MainWindow, self).__init__()
+        super().__init__()
 
         self.setWindowTitle("GetDist GUI")
         self.setWindowIcon(self._icon('Icon', False))

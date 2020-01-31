@@ -38,7 +38,7 @@ class BoundedMaxNLocator(ticker.MaxNLocator):
                 else:
                     g2.append(0)
             self._offsets.append(_staircase(np.array(g2), g))
-        super(BoundedMaxNLocator, self).__init__(nbins=nbins, steps=step_groups[0])
+        super().__init__(nbins=nbins, steps=step_groups[0])
 
     def _bounded_prune(self, locs, label_len):
         if len(locs) > 1 and self.bounded_prune:

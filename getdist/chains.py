@@ -1094,7 +1094,7 @@ class Chains(WeightedSamples):
                 for off1, off2 in zip(self.chain_offsets[:-1], self.chain_offsets[1:]):
                     lens.append(np.count_nonzero(where[off1:off2]))
                 self.chain_offsets = np.cumsum(np.array(lens))
-            super(Chains, self).filter(where)
+            super().filter(where)
         else:
             raise ValueError('chains are separated, makeSingle first or call filter on individual chains')
 
@@ -1431,7 +1431,7 @@ class Chains(WeightedSamples):
                             of multiple chains
         :param make_dirs: True if this should (recursively) create the directory if it doesn't exist
         """
-        super(Chains, self).saveAsText(root, chain_index, make_dirs)
+        super().saveAsText(root, chain_index, make_dirs)
         if not chain_index:
             self.saveTextMetadata(root)
 

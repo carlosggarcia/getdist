@@ -378,7 +378,7 @@ class Mixture2D(MixtureND):
         :return: value of pdf at x or x,y
         """
         if y is None:
-            return super(Mixture2D, self).pdf(x)
+            return super().pdf(x)
         tot = None
         for i, (mean, icov, weight, norm) in enumerate(zip(self.means, self.invcovs, self.weights, self.norms)):
             dx = x - mean[0]
@@ -402,7 +402,7 @@ class Gaussian2D(Mixture2D):
         :param cov: 2x2 array of covariance, or list of [sigma_x, sigma_y, correlation] values
         :param kwargs: arguments passed to :class:`Mixture2D`
         """
-        super(Gaussian2D, self).__init__([mean], [cov], **kwargs)
+        super().__init__([mean], [cov], **kwargs)
 
 
 class GaussianND(MixtureND):
@@ -423,7 +423,7 @@ class GaussianND(MixtureND):
             cov = np.loadtxt(cov)
         if is_inv_cov:
             cov = np.linalg.inv(cov)
-        super(GaussianND, self).__init__([mean], [cov], **kwargs)
+        super().__init__([mean], [cov], **kwargs)
 
 
 class Mixture1D(MixtureND):
@@ -466,7 +466,7 @@ class Gaussian1D(Mixture1D):
         :param sigma:  standard deviation
         :param kwargs:  arguments passed to :class:`Mixture1D`
         """
-        super(Gaussian1D, self).__init__([mean], [sigma], **kwargs)
+        super().__init__([mean], [sigma], **kwargs)
 
 
 class RandomTestMixtureND(MixtureND):
@@ -490,8 +490,8 @@ class RandomTestMixtureND(MixtureND):
         for _ in range(ncomponent):
             A = np.random.rand(ndim, ndim)
             covs.append(np.dot(A, A.T))
-        super(RandomTestMixtureND, self).__init__(np.random.rand(ncomponent, ndim), covs, weights=weights,
-                                                  lims=None, names=names, label=label)
+        super().__init__(np.random.rand(ncomponent, ndim), covs, weights=weights,
+                         lims=None, names=names, label=label)
 
 
 def randomTestMCSamples(ndim=4, ncomponent=1, nsamp=10009, nMCSamples=1, seed=10, names=None, labels=None):

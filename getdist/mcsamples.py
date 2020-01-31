@@ -489,7 +489,7 @@ class MCSamples(Chains):
 
         :return: self
         """
-        super(MCSamples, self).updateBaseStatistics()
+        super().updateBaseStatistics()
         mult_max = (self.mean_mult * self.numrows) / min(self.numrows // 2, 500)
         outliers = np.sum(self.weights > mult_max)
         if outliers != 0:
@@ -2308,7 +2308,7 @@ class MCSamples(Chains):
 
         if range is not None:
             self.ranges.setRange(name, range)
-        return super(MCSamples, self).addDerived(paramVec, name, label=label, comment=comment)
+        return super().addDerived(paramVec, name, label=label, comment=comment)
 
     def getParamBestFitDict(self, best_sample=False, want_derived=True, want_fixed=True, max_posterior=True):
         """
@@ -2345,7 +2345,7 @@ class MCSamples(Chains):
         :param want_fixed: also include values of any fixed parameters
         :return: ordered dictionary of parameter values
         """
-        res = super(MCSamples, self).getParamSampleDict(ix, want_derived=want_derived)
+        res = super().getParamSampleDict(ix, want_derived=want_derived)
         if want_fixed:
             res.update(self.ranges.fixedValueDict())
         return res
@@ -2388,7 +2388,7 @@ class MCSamples(Chains):
         :param root: root file name
         :param properties: optional dictiory of values to save in root.properties.ini
         """
-        super(MCSamples, self).saveTextMetadata(root)
+        super().saveTextMetadata(root)
         self.ranges.saveToFile(root + '.ranges')
         ini_name = root + '.properties.ini'
         if properties or self.properties and self.properties.params or self.label:
