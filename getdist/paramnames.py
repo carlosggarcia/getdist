@@ -152,6 +152,7 @@ class ParamList:
 
     :ivar names: list of :class:`ParamInfo` objects
     """
+    loadFromFile: callable
 
     def __init__(self, fileName=None, setParamNameFile=None, default=0, names=None, labels=None):
         """
@@ -216,7 +217,7 @@ class ParamList:
                 return par
         return None
 
-    def parWithName(self, name, error=False, renames={}):
+    def parWithName(self, name, error=False, renames=None):
         """
         Gets the :class:`ParamInfo` object for the parameter with the given name
 
@@ -225,10 +226,12 @@ class ParamList:
         :param renames: a dictionary that is used to provide optional name mappings
                         to the stored names
         """
-        given_names = set([name] + makeList(renames.get(name, [])))
+        given_names = {name}
+        if renames:
+            given_names.update(makeList(renames.get(name, [])))
         for par in self.names:
             known_names = set([par.name] + makeList(getattr(par, 'renames', [])) +
-                              makeList(renames.get(par.name, [])))
+                              (makeList(renames.get(par.name, [])) if renames else []))
             if known_names.intersection(given_names):
                 return par
         if error:
@@ -247,7 +250,7 @@ class ParamList:
                 return i
         return -1
 
-    def parsWithNames(self, names, error=False, renames={}):
+    def parsWithNames(self, names, error=False, renames=None):
         """
         gets the list of :class:`ParamInfo` instances for given list of name strings.
         Also expands any names that are globs into list with matching parameter names

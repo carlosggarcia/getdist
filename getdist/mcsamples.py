@@ -11,7 +11,7 @@ import getdist
 from getdist import chains, types, covmat, ParamInfo, IniFile, ParamNames, cobaya_interface
 from getdist.densities import Density1D, Density2D, DensityND
 from getdist.densities import getContourLevels as getOtherContourLevels
-from getdist.chains import Chains, chainFiles, lastModified, WeightedSampleError, ParamError
+from getdist.chains import Chains, chainFiles, last_modified, WeightedSampleError, ParamError
 from getdist.convolve import convolve1D, convolve2D
 from getdist.cobaya_interface import MCSamplesFromCobaya
 import getdist.kde_bandwidth as kde
@@ -41,7 +41,7 @@ class BandwidthError(MCSamplesError):
     pass
 
 
-def loadMCSamples(file_root, ini=None, jobItem=None, no_cache=False, settings={}):
+def loadMCSamples(file_root, ini=None, jobItem=None, no_cache=False, settings=None):
     """
     Loads a set of samples from a file or files.
 
@@ -84,7 +84,7 @@ def loadMCSamples(file_root, ini=None, jobItem=None, no_cache=False, settings={}
             os.path.join(folder, f) for f in os.listdir(folder) if (
                     f.startswith(prefix) and
                     any(f.lower().endswith(end) for end in ['updated.yaml', 'full.yaml']))]
-    if not no_cache and os.path.exists(cachefile) and lastModified(allfiles) < os.path.getmtime(cachefile):
+    if not no_cache and os.path.exists(cachefile) and last_modified(allfiles) < os.path.getmtime(cachefile):
         try:
             with open(cachefile, 'rb') as inp:
                 cache = pickle.load(inp)
@@ -608,7 +608,7 @@ class MCSamples(Chains):
         return fraction_indices
 
     def PCA(self, params, param_map=None, normparam=None, writeDataToFile=False, filename=None,
-            conditional_params=[], n_best_only=None):
+            conditional_params=(), n_best_only=None):
         """
         Perform principle component analysis (PCA). In other words,
         get eigenvectors and eigenvalues for normalized variables
@@ -820,7 +820,7 @@ class MCSamples(Chains):
         return lines
 
     def getConvergeTests(self, test_confidence=0.95, writeDataToFile=False,
-                         what=['MeanVar', 'GelmanRubin', 'SplitTest', 'RafteryLewis', 'CorrLengths'],
+                         what=('MeanVar', 'GelmanRubin', 'SplitTest', 'RafteryLewis', 'CorrLengths'),
                          filename=None, feedback=False):
         """
         Do convergence tests.
@@ -904,6 +904,7 @@ class MCSamples(Chains):
                 lines += "var(mean)/mean(var) for eigenvalues of covariance of y of orthonormalized parameters\n"
                 for jj, Di in enumerate(D):
                     lines += "%3i%13.5f\n" % (jj + 1, Di)
+                # noinspection PyStringFormat
                 GRSummary = " var(mean)/mean(var), remaining chains, worst e-value: R-1 = %13.5F" % self.GelmanRubin
             else:
                 self.GelmanRubin = None
@@ -2350,7 +2351,7 @@ class MCSamples(Chains):
             res.update(self.ranges.fixedValueDict())
         return res
 
-    def getCombinedSamplesWithSamples(self, samps2, sample_weights=[1, 1]):
+    def getCombinedSamplesWithSamples(self, samps2, sample_weights=(1, 1)):
         """
         Make a new  :class:`MCSamples` instance by appending samples from samps2 for parameters which are in common.
         By default they are weighted so that the probability mass of each set of samples is the same,
@@ -2370,7 +2371,7 @@ class MCSamples(Chains):
             loglikes = None
         if sample_weights is None:
             fac = 1
-            sample_weights = [1, 1]
+            sample_weights = (1, 1)
         else:
             fac = np.sum(self.weights) / np.sum(samps2.weights)
         weights = np.concatenate([self.weights * sample_weights[0], samps2.weights * sample_weights[1] * fac])
@@ -2381,7 +2382,7 @@ class MCSamples(Chains):
                           ranges=self.ranges, settings=copy.deepcopy(self.ini.params))
         return samps
 
-    def saveTextMetadata(self, root, properties={}):
+    def saveTextMetadata(self, root, properties=None):
         """
         Saves metadata about the sames to text files with given file root
 
@@ -2400,12 +2401,12 @@ class MCSamples(Chains):
                 ini.params.update(self.properties.params)
             if self.label:
                 ini.params.update({'label': self.label})
-            ini.params.update(properties)
+            ini.params.update(properties or {})
             ini.saveFile(ini_name)
         elif os.path.exists(ini_name):
             os.remove(ini_name)
 
-    def saveChainsAsText(self, root, make_dirs=False, properties={}):
+    def saveChainsAsText(self, root, make_dirs=False, properties=None):
         if self.chains is None:
             chain_list = self.getSeparateChains()
         else:
@@ -2430,7 +2431,7 @@ class MCSamples(Chains):
             text += 'g.plots_1d(roots, markers=markers)'
         self._WritePlotFile(filename, self.subplot_size_inch, text, '', ext)
 
-    def _writeScriptPlots2D(self, filename, plot_2D_param=None, cust2DPlots=[], ext=None):
+    def _writeScriptPlots2D(self, filename, plot_2D_param=None, cust2DPlots=(), ext=None):
         """
         Write script that generates a 2 dimensional plot. Only intended for use by getdist script.
 

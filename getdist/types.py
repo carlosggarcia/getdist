@@ -286,8 +286,6 @@ class ResultTable:
         else:
             self.format = formatter
         self.ncol = ncol
-        if isinstance(results, str):
-            results = [results]
         if tableParamNames is None:
             self.tableParamNames = results[0]
         else:
@@ -470,7 +468,9 @@ class ParamResults(ParamList):
 
 
 class LikelihoodChi2:
-    pass
+    name: str
+    tag: str
+    chisq: float
 
 
 class BestFit(ParamResults):

@@ -141,7 +141,7 @@ def autoConvolve(x, n=None, normalize=True):
     return res
 
 
-def convolveGaussianDCT(x, sigma, pad_sigma=4, mode='same', cache={}):
+def convolveGaussianDCT(x, sigma, pad_sigma=4, mode='same', cache=None):
     """
     1D convolution of x with Gaussian of width sigma pixels
     If pad_sigma>0, pads ends with zeros by int(pad_sigma*sigma) pixels
@@ -159,7 +159,7 @@ def convolveGaussianDCT(x, sigma, pad_sigma=4, mode='same', cache={}):
 
     s = padded_x.size
     hnorm = sigma / float(s)
-    gauss = cache.get((s, hnorm))
+    gauss = cache.get((s, hnorm)) if cache is not None else None
     if gauss is None:
         gauss = np.exp(-(np.arange(0, s) * (np.pi * hnorm)) ** 2 / 2.)
         cache[(s, hnorm)] = gauss

@@ -1,4 +1,5 @@
 import os
+
 try:
     from getdist.plots import get_subplot_plotter
 except ImportError:
@@ -16,7 +17,7 @@ import logging
 default_nsamp = 10000
 
 
-def simFiles(prob, file_root, sample_lengths=[1000, 2000, 5000, 10000, 20000, 50000, 100000], text=True):
+def simFiles(prob, file_root, sample_lengths=(1000, 2000, 5000, 10000, 20000, 50000, 100000), text=True):
     for nn in sample_lengths:
         samples = prob.MCSamples(nn, logLikes=True)
         if text:
@@ -25,7 +26,7 @@ def simFiles(prob, file_root, sample_lengths=[1000, 2000, 5000, 10000, 20000, 50
             samples.savePickle(file_root + '.py_mcsamples')
 
 
-def compareSimPlot2D(g, samples, density, pars=['x', 'y']):
+def compareSimPlot2D(g, samples, density, pars=('x', 'y')):
     g.plot_2d(samples, pars)
     density.normalize('max')
     levels = density.getContourLevels(contours=[0.68, 0.95])
@@ -42,17 +43,17 @@ def compareSimPlot(g, samples, density, par='x', normalized=True):
         plt.ylim(0, plt.gca().get_ylim()[1] * 1.1)
 
 
-def plot1DSim(g, prob, nsamp=default_nsamp, settings={}):
+def plot1DSim(g, prob, nsamp=default_nsamp, settings=None):
     samps = prob.MCSamples(nsamp, settings=settings)
     compareSimPlot(g, samps, prob.density1D())
 
 
-def plot2DSim(g, prob, nsamp=default_nsamp, settings={}):
+def plot2DSim(g, prob, nsamp=default_nsamp, settings=None):
     samps = prob.MCSamples(nsamp, settings=settings)
     compareSimPlot2D(g, samps, prob.density2D())
 
 
-def compare1D(g, probs, nsamp=default_nsamp, settings={}):
+def compare1D(g, probs, nsamp=default_nsamp, settings=None):
     samples = []
     for i, prob in enumerate(probs):
         samps = prob.MCSamples(nsamp, settings=settings)
@@ -66,7 +67,7 @@ def compare1D(g, probs, nsamp=default_nsamp, settings={}):
     plt.subplots_adjust()
 
 
-def compare2D(g, probs, nsamp=default_nsamp, settings={}):
+def compare2D(g, probs, nsamp=default_nsamp, settings=None):
     samples = []
     for i, prob in enumerate(probs):
         samps = prob.MCSamples(nsamp, settings=settings)
@@ -80,7 +81,7 @@ def compare2D(g, probs, nsamp=default_nsamp, settings={}):
     plt.subplots_adjust()
 
 
-def get2DMises(prob, nsamp=default_nsamp, nsim=20, scales=np.arange(0.6, 1.5, 0.1), settings={}):
+def get2DMises(prob, nsamp=default_nsamp, nsim=20, scales=np.arange(0.6, 1.5, 0.1), settings=None):
     # Get 2D MISE (mean integrated square error) as function of bandwidth scaling
     Mises = np.zeros(np.asarray(scales).size)
     for _ in range(nsim):
@@ -97,7 +98,7 @@ def get2DMises(prob, nsamp=default_nsamp, nsim=20, scales=np.arange(0.6, 1.5, 0.
     return scales, Mises
 
 
-def get1DMises(prob, nsamp=default_nsamp, nsim=50, scales=[0.6, 1.5, 0.1], settings={}):
+def get1DMises(prob, nsamp=default_nsamp, nsim=50, scales=(0.6, 1.5, 0.1), settings=None):
     # Get 1D MISE (mean integrated square error) as function of bandwidth scaling
     Mises = np.zeros(np.asarray(scales).size)
     failures = 0
@@ -139,7 +140,7 @@ class Test1DDistributions:
         self.shape_set = [self.gauss, self.skew, self.tailed, self.broad, self.flat, self.flat_top]
         self.all = self.shape_set + self.bimodal + self.trimodal + self.cut_gaussians
 
-    def cutGaussians(self, sigma=1, cut_x=[-1.5, -1, -0.5, 0, 1, 1.5]):
+    def cutGaussians(self, sigma=1, cut_x=(-1.5, -1, -0.5, 0, 1, 1.5)):
         return [Gaussian1D(0, sigma, xmin=cut, label=r'Gaussian [$x>%s$]' % cut) for cut in cut_x]
 
     def distributions(self):
@@ -205,15 +206,15 @@ class Test2DDistributions:
 
         self.all = self.shape_set + self.bimodal + self.trimodal + self.quadrimodal + self.cut_gaussians
 
-    def cutGaussians(self, cov, cut_x=[-2, -1, -0.5, 0, 1, 1.5, 2]):
+    def cutGaussians(self, cov, cut_x=(-2, -1, -0.5, 0, 1, 1.5, 2)):
         return [Gaussian2D([0, 0], cov, xmin=cut, label=r'Gaussian [$x>%s$]' % cut) for cut in cut_x]
 
     def distributions(self):
         return self.all
 
 
-def plot_compare_method(ax, prob, colors=['k'], sims=100, nsamp=default_nsamp,
-                        scalings=[0.3, 0.5, 0.7, 0.9, 1, 1.1, 1.3, 1.5, 1.7], test_settings=[None], linestyles=['-']):
+def plot_compare_method(ax, prob, colors=('k'), sims=100, nsamp=default_nsamp,
+                        scalings=(0.3, 0.5, 0.7, 0.9, 1, 1.1, 1.3, 1.5, 1.7), test_settings=(None,), linestyles=('-',)):
     # compare Parzen estimator with higher order
     print(prob.label, ', size = ', nsamp)
     if len(colors) == 1:
@@ -239,7 +240,7 @@ def plot_compare_probs_methods(ax, probs, colors=plt.rcParams["axes.prop_cycle"]
         plot_compare_method(ax, prob, col, **kwargs)
 
 
-def compare_method_nsims(g, probs, sizes=[1000, 10000], **kwargs):
+def compare_method_nsims(g, probs, sizes=(1000, 10000), **kwargs):
     g.make_figure(len(sizes))
     for i, size in enumerate(sizes):
         ax = g._subplot_number(i)
@@ -278,7 +279,7 @@ def join_subplots(ax_array):
     plt.subplots_adjust(wspace=0, hspace=0)
 
 
-def run_test_program(plots=['dists_2D', 'dists_1D'], sims=100, nsamp=default_nsamp, mbc=1, bco=1):
+def run_test_program(plots=('dists_2D', 'dists_1D'), sims=100, nsamp=default_nsamp, mbc=1, bco=1):
     import time
 
     chains.print_load_details = False

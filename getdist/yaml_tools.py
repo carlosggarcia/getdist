@@ -3,6 +3,7 @@
 import re
 
 try:
+    # noinspection PyPackageRequirements
     import yaml
 except ModuleNotFoundError:
     raise ModuleNotFoundError(

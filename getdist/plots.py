@@ -28,8 +28,11 @@ from getdist.densities import Density2D
 from getdist.gaussian_mixtures import MixtureND
 from getdist.matplotlib_ext import BoundedMaxNLocator, SciFuncFormatter
 from getdist._base import _BaseObject
+from types import MappingProxyType
 
 """Plotting scripts for GetDist outputs"""
+
+empty_dict = MappingProxyType({})
 
 
 class GetDistPlotError(Exception):
@@ -1492,7 +1495,8 @@ class GetDistPlotter(_BaseObject):
         ax.set_ylabel(param.latexLabel(), fontsize=self._scaled_fontsize(self.settings.axes_labelsize), **kwargs)
 
     def plot_1d(self, roots, param, marker=None, marker_color=None, label_right=False, title_limit=None,
-                no_ylabel=False, no_ytick=False, no_zero=False, normalized=False, param_renames={}, ax=None, **kwargs):
+                no_ylabel=False, no_ytick=False, no_zero=False, normalized=False, param_renames=None, ax=None,
+                **kwargs):
         """
         Make a single 1D plot with marginalized density lines.
 
@@ -1720,7 +1724,7 @@ class GetDistPlotter(_BaseObject):
         self.subplots[:, :] = None
         return self.plot_col, self.plot_row
 
-    def get_param_array(self, root, params=None, renames={}):
+    def get_param_array(self, root, params=None, renames=None):
         """
         Gets an array of :class:`~.paramnames.ParamInfo` for named params
         in the given `root`.
@@ -1754,14 +1758,15 @@ class GetDistPlotter(_BaseObject):
             # Add renames of given ParamInfo's to the renames dict
             renames_from_param_info = {param.name: getattr(param, "renames", [])
                                        for i, param in enumerate(params) if is_param_info[i]}
-            renames = mergeRenames(renames, renames_from_param_info)
+            if renames:
+                renames = mergeRenames(renames, renames_from_param_info)
+            else:
+                renames = renames_from_param_info
             params = [getattr(param, "name", param) for param in params]
         old = [(old if isinstance(old, ParamInfo) else ParamInfo(old)) for old in params]
-        return [new or old for new, old in zip(
-            names.parsWithNames(params, error=error, renames=renames),
-            old)]
+        return [new or old for new, old in zip(names.parsWithNames(params, error=error, renames=renames), old)]
 
-    def _check_param(self, root, param, renames={}):
+    def _check_param(self, root, param, renames=None):
         """
         Get :class:`~.paramnames.ParamInfo` for given name for samples with specified root
 
@@ -1777,7 +1782,10 @@ class GetDistPlotter(_BaseObject):
         if isinstance(param, ParamInfo):
             name = param.name
             if hasattr(param, 'renames'):
-                renames = {name: makeList(renames.get(name, [])) + list(param.renames)}
+                if renames:
+                    renames = {name: makeList(renames.get(name, [])) + list(param.renames)}
+                else:
+                    renames = {name: list(param.renames)}
         else:
             name = param
         # NB: If a parameter is not found, errors only if param is a ParamInfo instance
@@ -1991,7 +1999,7 @@ class GetDistPlotter(_BaseObject):
 
     def plots_1d(self, roots, params=None, legend_labels=None, legend_ncol=None, label_order=None, nx=None,
                  param_list=None, roots_per_param=False, share_y=None, markers=None, title_limit=None,
-                 xlims=None, param_renames={}, **kwargs):
+                 xlims=None, param_renames=None, **kwargs):
         """
         Make an array of 1D marginalized density subplots
 
@@ -2039,7 +2047,8 @@ class GetDistPlotter(_BaseObject):
         if param_list is not None:
             wanted_params = ParamNames(param_list).list()
             params = [param for param in params if
-                      param.name in wanted_params or param_renames.get(param.name, '') in wanted_params]
+                      param.name in wanted_params or param_renames and param_renames.get(param.name,
+                                                                                         '') in wanted_params]
         nparam = len(params)
         if share_y is None:
             share_y = self.settings.prob_label is not None and nparam > 1
@@ -2238,8 +2247,8 @@ class GetDistPlotter(_BaseObject):
     def triangle_plot(self, roots, params=None, legend_labels=None, plot_3d_with_param=None, filled=False, shaded=False,
                       contour_args=None, contour_colors=None, contour_ls=None, contour_lws=None, line_args=None,
                       label_order=None, legend_ncol=None, legend_loc=None, title_limit=None, upper_roots=None,
-                      upper_kwargs={}, upper_label_right=False, diag1d_kwargs={}, markers=None, marker_args={},
-                      param_limits={}, **kwargs):
+                      upper_kwargs=empty_dict, upper_label_right=False, diag1d_kwargs=empty_dict, markers=None,
+                      marker_args=empty_dict, param_limits=empty_dict, **kwargs):
         """
         Make a trianglular array of 1D and 2D plots.
 
@@ -2513,7 +2522,7 @@ class GetDistPlotter(_BaseObject):
                          **args)
 
     def rectangle_plot(self, xparams, yparams, yroots=None, roots=None, plot_roots=None, plot_texts=None,
-                       xmarkers=None, ymarkers=None, marker_args={}, param_limits={},
+                       xmarkers=None, ymarkers=None, marker_args=empty_dict, param_limits=empty_dict,
                        legend_labels=None, legend_ncol=None, label_order=None, **kwargs):
         """
         Make a grid of 2D plots.
@@ -2558,7 +2567,7 @@ class GetDistPlotter(_BaseObject):
         """
         xparams = makeList(xparams)
         yparams = makeList(yparams)
-        self.make_figure(nx=len(xparams), ny=len(yparams), sharex=len(yparams), sharey=len(xparams))
+        self.make_figure(nx=len(xparams), ny=len(yparams), sharex=bool(yparams), sharey=bool(xparams))
         sharey = None
         yshares = []
         xshares = []
@@ -2750,7 +2759,7 @@ class GetDistPlotter(_BaseObject):
             # use most samples, but alpha with weight
             from matplotlib.cm import ScalarMappable
             from matplotlib.colors import Normalize, to_rgb
-            max_weight = weights.max()
+            max_weight = np.max(weights)
             dup_fac = 4
             filt = weights > max_weight / (100 * dup_fac)
             x = samples[0][filt]

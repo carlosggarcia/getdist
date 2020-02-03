@@ -35,6 +35,7 @@ class CovMat:
                 self.size = len(self.paramNames)
             else:
                 raise Exception('.covmat must now have parameter names header')
+            # noinspection PyTypeChecker
             self.matrix = np.loadtxt(f)
 
     def saveToFile(self, filename):

@@ -48,7 +48,7 @@ def yaml_file_or_dict(file_or_dict):
 
 
 def MCSamplesFromCobaya(info, collections, name_tag=None,
-                        ignore_rows=0, ini=None, settings={}):
+                        ignore_rows=0, ini=None, settings=None):
     """
     Creates a set of samples from Cobaya's output.
     Parameter names, ranges and labels are taken from the "info" dictionary

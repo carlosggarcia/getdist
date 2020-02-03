@@ -30,6 +30,7 @@ def is_grid_object(obj):
     return hasattr(obj, "resolve_root") or hasattr(obj, "resolveRoot")
 
 
+# noinspection PyUnresolvedReferences
 def load_supported_grid(chain_dir):
     if is_grid_object(chain_dir):
         return chain_dir

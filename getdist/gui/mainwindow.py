@@ -4,6 +4,7 @@ import os
 import copy
 import logging
 import matplotlib
+import matplotlib.colors
 import numpy as np
 import scipy
 import sys
@@ -58,6 +59,7 @@ except ImportError:
     batchjob = None
 
 
+# noinspection PyCallByClass
 class NavigationToolbar(QNavigationToolbar):
     def sizeHint(self):
         return QToolBar.sizeHint(self)
@@ -98,6 +100,7 @@ class RootListWidget(QListWidget):
         self.owner._updateParameters()
 
 
+# noinspection PyCallByClass,PyArgumentList
 class MainWindow(QMainWindow):
     def __init__(self, app, ini=None, base_dir=None):
         """
@@ -1826,6 +1829,7 @@ class MainWindow(QMainWindow):
             bbox_inches='tight')
         buf.seek(0)
 
+        # noinspection PyTypeChecker
         image = QImage.fromData(buf.getvalue())
 
         pixmap = QPixmap.fromImage(image)
@@ -1864,6 +1868,7 @@ class DialogTextOutput(QDialog):
 
 # ==============================================================================
 
+# noinspection PyArgumentList
 class DialogLikeStats(DialogTextOutput):
     def __init__(self, parent, stats, root):
         DialogTextOutput.__init__(self, parent, stats.likeSummary())
@@ -1913,8 +1918,9 @@ class DialogLikeStats(DialogTextOutput):
 
 # ==============================================================================
 
+# noinspection PyArgumentList
 class DialogMargeStats(QDialog):
-    def __init__(self, parent=None, stats="", root=''):
+    def __init__(self, parent=None, stats=None, root=''):
         QDialog.__init__(self, parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint)
 
         self.label = QLabel(self)
@@ -1975,6 +1981,7 @@ class DialogConvergeStats(DialogTextOutput):
 
         self.setLayout(layout)
         self.setWindowTitle(self.tr('Convergence stats: ' + root))
+        # noinspection PyArgumentList
         h = min(QApplication.desktop().screenGeometry().height() * 4 / 5, 1200)
         self.resize(700, h)
 
@@ -1988,12 +1995,14 @@ class DialogPCA(DialogTextOutput):
         layout.addWidget(self.text, 0, 0)
         self.setLayout(layout)
         self.setWindowTitle(self.tr('PCA constraints for: ' + root))
+        # noinspection PyArgumentList
         h = min(QApplication.desktop().screenGeometry().height() * 4 / 5, 800)
         self.resize(500, h)
 
 
 # ==============================================================================
 
+# noinspection PyCallByClass
 class DialogParamTables(DialogTextOutput):
     def __init__(self, parent, tables, root):
         DialogTextOutput.__init__(self, parent)
@@ -2039,12 +2048,12 @@ class DialogParamTables(DialogTextOutput):
             self.generated[index] = True
 
     def copyLatex(self):
+        # noinspection PyArgumentList
         clipboard = QApplication.clipboard()
         clipboard.setText(self.tables[self.tabWidget.currentIndex()].tableTex())
 
     def saveLatex(self):
-        filename, _ = QFileDialog.getSaveFileName(
-            self, "Choose a file name", '.', "Latex (*.tex)")
+        filename, _ = QFileDialog.getSaveFileName(self, "Choose a file name", '.', "Latex (*.tex)")
         if not filename:
             return
         self.tables[self.tabWidget.currentIndex()].write(str(filename))
@@ -2052,6 +2061,7 @@ class DialogParamTables(DialogTextOutput):
 
 # ==============================================================================
 
+# noinspection PyArgumentList
 class DialogSettings(QDialog):
     def __init__(self, parent, ini, items=None, title='Analysis Settings', width=320, update=None):
         QDialog.__init__(self, parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint)

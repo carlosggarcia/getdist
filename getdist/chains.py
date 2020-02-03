@@ -7,18 +7,19 @@ from getdist import cobaya_interface
 import pickle
 import logging
 from copy import deepcopy
+from collections import namedtuple
+from typing import Sequence, Any, Optional
 
 # whether to write to terminal chain names and burn in details when loaded from file
 print_load_details = True
 
 _int_types = (int, np.integer)
+ParamConfidenceData = namedtuple("ParamConfidenceData", ("paramVec", "norm", "indexes", "cumsum"))
 
 try:
     import pandas
-
-    use_pandas = True
 except ImportError:
-    use_pandas = False
+    pandas = None
 
 
 class WeightedSampleError(Exception):
@@ -35,7 +36,7 @@ class ParamError(WeightedSampleError):
     pass
 
 
-def lastModified(files):
+def last_modified(files):
     """
     Returns the the latest "last modified" time for the given list of files. Ignores files that do not exist.
 
@@ -124,7 +125,7 @@ def loadNumpyTxt(fname, skiprows=None):
     :return: numpy array of the data values
     """
     try:
-        if use_pandas:
+        if pandas:
             return pandas.read_csv(fname, delim_whitespace=True, header=None, dtype=np.float64,
                                    skiprows=skiprows, comment='#').values
         else:
@@ -179,13 +180,6 @@ def covToCorr(cov, copy=True):
     return cov
 
 
-class ParamConfidenceData:
-    """
-    a cache object for confidence interval data
-    """
-    pass
-
-
 class ParSamples:
     """
     An object used as a container for named parameter sample arrays
@@ -193,6 +187,7 @@ class ParSamples:
     pass
 
 
+# noinspection PyAttributeOutsideInit
 class WeightedSamples:
     """
     WeightedSamples is the base class for a set of weighted parameter samples
@@ -204,6 +199,14 @@ class WeightedSamples:
     :ivar numrows: number of samples positions (rows in the samples array)
     :ivar name_tag: name tag for the samples
     """
+
+    weights: Optional[np.ndarray]
+    loglikes: Optional[np.ndarray]
+    samples: Optional[np.ndarray]
+    norm: Any
+    n: Any
+    numrows: Any
+    paramNames: Optional[ParamNames]
 
     def __init__(self, filename=None, ignore_rows=0, samples=None, weights=None, loglikes=None, name_tag=None,
                  label=None, files_are_chains=True, min_weight_ratio=1e-30):
@@ -526,9 +529,9 @@ class WeightedSamples:
         #         break
         # N1 = corr[0] + 2 * np.sum(corr[1:])
 
-        def corr_k(k):
-            return np.dot(np.exp(-(d[:-k] - d[k:]) ** 2 / (4 * kernel_std ** 2)) * self.weights[:-k],
-                          self.weights[k:]) - (n - k) * uncorr_term
+        def corr_k(_k):
+            return np.dot(np.exp(-(d[:-_k] - d[_k:]) ** 2 / (4 * kernel_std ** 2)) * self.weights[:-_k],
+                          self.weights[_k:]) - (n - _k) * uncorr_term
 
         threshold = min_corr * corr[0]
         corr[1] = corr_k(1)
@@ -744,7 +747,7 @@ class WeightedSamples:
         else:
             return paramVec[where] - self.mean(paramVec, where)
 
-    def mean_diffs(self, pars=None, where=None):
+    def mean_diffs(self, pars=None, where=None) -> Sequence:
         """
         Calculates a list of parameter vectors giving distances from parameter means
 
@@ -758,7 +761,9 @@ class WeightedSamples:
         if isinstance(pars, _int_types) and pars >= 0 and where is None:
             means = self.getMeans()
             return [self.samples[:, i] - means[i] for i in range(pars)]
-        return [self.mean_diff(i, where) for i in pars]
+        else:
+            # noinspection PyTypeChecker
+            return [self.mean_diff(i, where) for i in pars]
 
     def twoTailLimits(self, paramVec, confidence):
         """
@@ -783,13 +788,12 @@ class WeightedSamples:
         """
         if weights is None:
             weights = self.weights
-        d = ParamConfidenceData()
-        d.paramVec = self._makeParamvec(paramVec)[start:end]
-        d.norm = np.sum(weights[start:end])
-        d.indexes = d.paramVec.argsort()
-        weightsort = weights[start + d.indexes]
-        d.cumsum = np.cumsum(weightsort)
-        return d
+        paramVec = self._makeParamvec(paramVec)[start:end]
+        indices = paramVec.argsort()
+        return ParamConfidenceData(paramVec=paramVec,
+                                   norm=np.sum(weights[start:end]),
+                                   indexes=indices,
+                                   cumsum=np.cumsum(weights[start + indices]))
 
     def confidence(self, paramVec, limfrac, upper=False, start=0, end=None, weights=None):
         """
@@ -1004,11 +1008,13 @@ class WeightedSamples:
             os.makedirs(os.path.dirname(root))
         if root.endswith('.txt'):
             root = root[:-3]
+        # noinspection PyTypeChecker
         np.savetxt(root + ('' if chain_index is None else '_' + str(chain_index + 1)) + '.txt',
                    np.hstack((self.weights.reshape(-1, 1), loglikes.reshape(-1, 1), self.samples)),
                    fmt=self.precision)
 
 
+# noinspection PyAttributeOutsideInit
 class Chains(WeightedSamples):
     """
     Holds one or more sets of weighted samples, for example a set of MCMC chains.
@@ -1237,7 +1243,7 @@ class Chains(WeightedSamples):
         self.changeSamples(np.c_[self.samples, paramVec])
         return self.paramNames.addDerived(name, **kwargs)
 
-    def loadChains(self, root, files_or_samples, weights=None, loglikes=None,
+    def loadChains(self, root, files_or_samples: Sequence, weights=None, loglikes=None,
                    ignore_lines=None):
         """
         Loads chains from files.
@@ -1286,7 +1292,7 @@ class Chains(WeightedSamples):
                     try:
                         a = a[0]
                         d += 1
-                    except:
+                    except (TypeError, IndexError):
                         return d
 
             dim = array_dimension(files_or_samples)

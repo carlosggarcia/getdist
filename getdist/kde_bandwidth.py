@@ -154,6 +154,7 @@ class KernelOptimizer2D:
         try:
             # t is the bandwidth squared (used for estimating moments), calculated using fixed point
             self.t_star = brentq(self._bandwidth_fixed_point_2D, 0, 0.1, xtol=0.001 ** 2)
+            # noinspection PyTypeChecker
             if fallback_t and self.t_star > 0.01 and self.t_star > 2 * fallback_t:
                 # For 2D distributions with boundaries, fixed point can overestimate significantly
                 logging.debug('KernelOptimizer2D Using fallback (t* > 2*t_gallback)')
