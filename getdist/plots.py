@@ -1,5 +1,6 @@
 import os
 import copy
+from collections import Mapping
 import matplotlib
 import sys
 import warnings
@@ -436,7 +437,7 @@ class MCSampleAnalysis(_BaseObject):
         self.analysis_settings = {}
         if isinstance(settings, IniFile):
             ini = settings
-        elif hasattr(settings, "keys"):
+        elif isinstance(settings, Mapping):
             ini = IniFile(getdist.default_getdist_settings)
             ini.params.update(settings)
         else:
@@ -748,7 +749,7 @@ class GetDistPlotter(_BaseObject):
         :param kwargs: optional settings to override in the current ones
         :return: The updated dict of arguments.
         """
-        if hasattr(self.settings.plot_args, "keys"):
+        if isinstance(self.settings.plot_args, Mapping):
             args = self.settings.plot_args
         elif isinstance(self.settings.plot_args, (list, tuple)):
             if len(self.settings.plot_args) > plotno:
@@ -1342,7 +1343,7 @@ class GetDistPlotter(_BaseObject):
             line_args = kwargs.get('contour_args')
         if line_args is None:
             line_args = [{}] * nroots
-        elif hasattr(line_args, "keys"):
+        elif isinstance(line_args, Mapping):
             line_args = [line_args] * nroots
         if len(line_args) < nroots:
             line_args += [{}] * (nroots - len(line_args))
@@ -2228,7 +2229,7 @@ class GetDistPlotter(_BaseObject):
     @staticmethod
     def _get_marker(markers, index, name):
         if markers is not None:
-            if hasattr(markers, "keys"):
+            if isinstance(markers, Mapping):
                 return markers.get(name)
             elif index < len(markers):
                 return markers[index]
@@ -2244,6 +2245,7 @@ class GetDistPlotter(_BaseObject):
             setattr(obj, par.name, samples[:, i])
         return obj
 
+    # noinspection PyUnboundLocalVariable
     def triangle_plot(self, roots, params=None, legend_labels=None, plot_3d_with_param=None, filled=False, shaded=False,
                       contour_args=None, contour_colors=None, contour_ls=None, contour_lws=None, line_args=None,
                       label_order=None, legend_ncol=None, legend_loc=None, title_limit=None, upper_roots=None,

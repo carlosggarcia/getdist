@@ -14,6 +14,7 @@ class InterpGridCache:
     __slots__ = "factor", "grid", "sortgrid", "bign", "norm", "softgrid", "cumsum"
 
 
+# noinspection PyTypeChecker
 def getContourLevels(inbins, contours=defaultContours, missing_norm=0, half_edge=True):
     """
      Get contour levels enclosing "contours" fraction of the probability, for any dimension bins array
@@ -298,6 +299,8 @@ class DensityND(GridDensity):
     """
     Class for ND marginalized densities, inheriting from :class:`GridDensity`
     and :class:`~scipy:scipy.interpolate.LinearNDInterpolator`.
+
+    This is not well tested recently.
     """
 
     def __init__(self, xs, P=None, view_ranges=None):
@@ -308,7 +311,7 @@ class DensityND(GridDensity):
         """
         self.dim = len(xs)
 
-        # for compat and tests
+        # for compatability and tests
         self.x = xs[0]
         if self.dim >= 2:
             self.y = xs[1]

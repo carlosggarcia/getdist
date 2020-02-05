@@ -2023,7 +2023,7 @@ class DialogParamTables(DialogTextOutput):
 
         self.setLayout(layout)
         self.tabs = [QWidget(self) for _ in range(len(tables))]
-        self.generated = [None] * len(tables)
+        self.generated = [False] * len(tables)
         for table, tab in zip(tables, self.tabs):
             self.tabWidget.addTab(tab, table.results[0].limitText(table.limit) + '%')
         self.tabChanged(0)

@@ -6,6 +6,7 @@ import logging
 from numbers import Number
 import numpy as np
 import os
+from collections import Mapping
 
 # Conventions
 _label = "label"
@@ -39,12 +40,14 @@ def cobaya_params_file(root):
     return None
 
 
-def yaml_file_or_dict(file_or_dict):
+def yaml_file_or_dict(file_or_dict) -> Mapping:
     if isinstance(file_or_dict, str):
         from getdist.yaml_tools import yaml_load_file
         return yaml_load_file(file_or_dict)
-    else:
+    elif isinstance(file_or_dict, Mapping):
         return file_or_dict
+    else:
+        raise ValueError('Cobya parameter input must be a dictionary or filename')
 
 
 def MCSamplesFromCobaya(info, collections, name_tag=None,
@@ -67,9 +70,6 @@ def MCSamplesFromCobaya(info, collections, name_tag=None,
     :return: The :class:`MCSamples` instance
     """
 
-    if not hasattr(info, "keys"):
-        raise TypeError("Cannot regonise arguments. Are you sure you are calling "
-                        "with (info, collections, ...) in that order?")
     if hasattr(collections, "data"):
         collections = [collections]
     # Check consistency between collections
@@ -216,12 +216,13 @@ def expand_info_param(info_param):
     Expands the info of a parameter, from the user friendly, shorter format
     to a more unambiguous one.
     """
-    info_param = deepcopy(info_param)
-    if not hasattr(info_param, "keys"):
+    if not isinstance(info_param, Mapping):
         if info_param is None:
             info_param = {}
         else:
             info_param = {_p_value: info_param}
+    else:
+        info_param = deepcopy(info_param)
     if all((f not in info_param) for f in [_prior, _p_value, _p_derived]):
         info_param[_p_derived] = True
     # Dynamical input parameters: save as derived by default

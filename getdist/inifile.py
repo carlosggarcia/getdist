@@ -38,7 +38,7 @@ class IniFile:
         self.expand_environment_variables = expand_environment_variables
         if isinstance(settings, str):
             self.readFile(settings, keep_includes)
-        elif hasattr(settings, "keys"):
+        elif settings:
             self.params.update(settings)
 
     def expand_placeholders(self, s):
