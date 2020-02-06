@@ -1,6 +1,6 @@
 import os
 import copy
-from collections import Mapping
+from typing import Mapping
 import matplotlib
 import sys
 import warnings
@@ -30,6 +30,7 @@ from getdist.gaussian_mixtures import MixtureND
 from getdist.matplotlib_ext import BoundedMaxNLocator, SciFuncFormatter
 from getdist._base import _BaseObject
 from types import MappingProxyType
+from typing import Sequence, Union
 
 """Plotting scripts for GetDist outputs"""
 
@@ -1375,7 +1376,7 @@ class GetDistPlotter(_BaseObject):
 
     def _make_contour_args(self, nroots, **kwargs):
         contour_args = self._make_line_args(nroots, **kwargs)
-        filled = kwargs.get('filled')
+        filled: Union[None, bool, Sequence] = kwargs.get('filled')
         if filled and not isinstance(filled, bool):
             for cont, fill in zip(contour_args, filled):
                 cont['filled'] = fill
@@ -1725,7 +1726,7 @@ class GetDistPlotter(_BaseObject):
         self.subplots[:, :] = None
         return self.plot_col, self.plot_row
 
-    def get_param_array(self, root, params=None, renames=None):
+    def get_param_array(self, root, params: Union[None, str, Sequence] = None, renames: Mapping = None):
         """
         Gets an array of :class:`~.paramnames.ParamInfo` for named params
         in the given `root`.
@@ -2749,6 +2750,7 @@ class GetDistPlotter(_BaseObject):
         else:
             pts = self.sample_analyser.load_single_samples(root)
             weights = 1
+            mcsamples = None
         names = self.param_names_for_root(root)
         fixed_color = kwargs.get('fixed_color')  # if actually just a plain scatter plot
         samples = []
@@ -2757,7 +2759,7 @@ class GetDistPlotter(_BaseObject):
                 samples.append(param.getDerived(self._make_param_object(names, pts)))
             else:
                 samples.append(pts[:, names.numberOfName(param.name)])
-        if alpha_samples:
+        if mcsamples:
             # use most samples, but alpha with weight
             from matplotlib.cm import ScalarMappable
             from matplotlib.colors import Normalize, to_rgb

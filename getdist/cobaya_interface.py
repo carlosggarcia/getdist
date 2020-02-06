@@ -6,7 +6,7 @@ import logging
 from numbers import Number
 import numpy as np
 import os
-from collections import Mapping
+from typing import Mapping
 
 # Conventions
 _label = "label"
@@ -152,6 +152,7 @@ def get_info_params(info):
     return info_params_full
 
 
+# noinspection PyUnboundLocalVariable
 def get_range(param_info):
     # Sampled
     if is_sampled_param(param_info):

@@ -20,10 +20,9 @@ def makeList(roots):
 def escapeLatex(text):
     if text:
         import matplotlib
-    if text and matplotlib.rcParams['text.usetex']:
-        return text.replace('_', '{\\textunderscore}')
-    else:
-        return text
+        if matplotlib.rcParams['text.usetex']:
+            return text.replace('_', '{\\textunderscore}')
+    return text
 
 
 def mergeRenames(*dicts, **kwargs):

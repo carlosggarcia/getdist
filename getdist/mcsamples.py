@@ -5,7 +5,7 @@ import copy
 import pickle
 import math
 import time
-from collections import Mapping
+from typing import Mapping
 
 import numpy as np
 from scipy.stats import norm

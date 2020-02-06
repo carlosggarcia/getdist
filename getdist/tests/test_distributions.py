@@ -249,6 +249,7 @@ def compare_method_nsims(g, probs, sizes=(1000, 10000), **kwargs):
 
 def compare_method(probs, nx=2, fname='', **kwargs):
     ny = (len(probs) - 1) // nx + 1
+    # noinspection PyTypeChecker
     fig, axs = plt.subplots(ny, nx, sharex=True, sharey=True, squeeze=False, figsize=(nx * 3, ny * 3))
     for i, prob in enumerate(probs):
         ax = axs.reshape(-1)[i]

@@ -8,7 +8,7 @@ import pickle
 import logging
 from copy import deepcopy
 from collections import namedtuple
-from typing import Sequence, Any, Optional
+from typing import Sequence, Any, Optional, Union
 
 # whether to write to terminal chain names and burn in details when loaded from file
 print_load_details = True
@@ -747,7 +747,7 @@ class WeightedSamples:
         else:
             return paramVec[where] - self.mean(paramVec, where)
 
-    def mean_diffs(self, pars=None, where=None) -> Sequence:
+    def mean_diffs(self, pars: Union[None, int, Sequence] = None, where=None) -> Sequence:
         """
         Calculates a list of parameter vectors giving distances from parameter means
 
@@ -762,7 +762,6 @@ class WeightedSamples:
             means = self.getMeans()
             return [self.samples[:, i] - means[i] for i in range(pars)]
         else:
-            # noinspection PyTypeChecker
             return [self.mean_diff(i, where) for i in pars]
 
     def twoTailLimits(self, paramVec, confidence):
